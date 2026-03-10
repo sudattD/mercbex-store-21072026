@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff8e1"/>
+      <stop offset="100%" style="stop-color:#ffecb3"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- Cotton boll -->
+  <circle cx="200" cy="140" r="50" fill="#f5f5dc" stroke="#8d6e63" stroke-width="2"/>
+  <path d="M200 90 Q210 70 200 50" stroke="#6d4c41" stroke-width="2" fill="none"/>
+  <ellipse cx="195" cy="52" rx="8" ry="5" fill="#66bb6a"/>
+  <ellipse cx="205" cy="48" rx="8" ry="5" fill="#66bb6a"/>
+  <!-- Cotton fiber texture -->
+  <circle cx="185" cy="130" r="15" fill="#fff" opacity="0.7"/>
+  <circle cx="210" cy="125" r="14" fill="#fff" opacity="0.6"/>
+  <circle cx="195" cy="150" r="13" fill="#fff" opacity="0.65"/>
+  <circle cx="215" cy="148" r="12" fill="#fff" opacity="0.6"/>
+  <!-- Bore hole in boll -->
+  <circle cx="205" cy="138" r="8" fill="#5d4037"/>
+  <circle cx="205" cy="138" r="5" fill="#3e2723"/>
+  <!-- Frass around hole -->
+  <circle cx="210" cy="145" r="2" fill="#795548" opacity="0.6"/>
+  <circle cx="215" cy="140" r="1.5" fill="#795548" opacity="0.5"/>
+  <circle cx="200" cy="148" r="1.5" fill="#795548" opacity="0.6"/>
+  <!-- Caterpillar/Bollworm -->
+  <g transform="translate(120, 200)">
+    <!-- Body segments -->
+    <ellipse cx="0" cy="0" rx="10" ry="8" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+    <ellipse cx="16" cy="-2" rx="10" ry="8" fill="#7cb342" stroke="#689f38" stroke-width="1"/>
+    <ellipse cx="32" cy="-4" rx="10" ry="8" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+    <ellipse cx="48" cy="-5" rx="10" ry="8" fill="#7cb342" stroke="#689f38" stroke-width="1"/>
+    <ellipse cx="64" cy="-4" rx="10" ry="8" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+    <ellipse cx="80" cy="-2" rx="10" ry="8" fill="#7cb342" stroke="#689f38" stroke-width="1"/>
+    <!-- Head -->
+    <circle cx="92" cy="0" r="8" fill="#a1887f" stroke="#795548" stroke-width="1"/>
+    <circle cx="95" cy="-3" r="2" fill="#3e2723"/>
+    <!-- Legs -->
+    <line x1="5" y1="6" x2="5" y2="14" stroke="#689f38" stroke-width="1.5"/>
+    <line x1="20" y1="4" x2="20" y2="12" stroke="#689f38" stroke-width="1.5"/>
+    <line x1="35" y1="2" x2="35" y2="10" stroke="#689f38" stroke-width="1.5"/>
+    <line x1="50" y1="1" x2="50" y2="9" stroke="#689f38" stroke-width="1.5"/>
+    <line x1="65" y1="2" x2="65" y2="10" stroke="#689f38" stroke-width="1.5"/>
+    <line x1="80" y1="4" x2="80" y2="12" stroke="#689f38" stroke-width="1.5"/>
+    <!-- Stripe pattern -->
+    <line x1="8" y1="-6" x2="8" y2="6" stroke="#558b2f" stroke-width="0.8" opacity="0.5"/>
+    <line x1="24" y1="-8" x2="24" y2="4" stroke="#558b2f" stroke-width="0.8" opacity="0.5"/>
+    <line x1="40" y1="-10" x2="40" y2="2" stroke="#558b2f" stroke-width="0.8" opacity="0.5"/>
+    <line x1="56" y1="-10" x2="56" y2="1" stroke="#558b2f" stroke-width="0.8" opacity="0.5"/>
+    <line x1="72" y1="-8" x2="72" y2="4" stroke="#558b2f" stroke-width="0.8" opacity="0.5"/>
+  </g>
+  <!-- Damaged leaf -->
+  <path d="M280 180 Q330 160 340 200 Q320 190 300 210 Q290 195 280 180Z" fill="#66bb6a" opacity="0.6"/>
+  <!-- Holes in leaf -->
+  <circle cx="310" cy="190" r="5" fill="#fff8e1"/>
+  <circle cx="320" cy="198" r="4" fill="#fff8e1"/>
+  <!-- Labels -->
+  <rect x="10" y="10" width="150" height="24" rx="12" fill="#fff" opacity="0.9"/>
+  <text x="85" y="26" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#e65100">Bollworm / Caterpillar</text>
+  <!-- Indicators -->
+  <line x1="250" y1="130" x2="213" y2="138" stroke="#d32f2f" stroke-width="1.5"/>
+  <text x="255" y="128" font-family="Arial,sans-serif" font-size="10" fill="#d32f2f">Entry hole</text>
+  <line x1="90" y1="240" x2="120" y2="210" stroke="#d32f2f" stroke-width="1.5"/>
+  <text x="30" y="252" font-family="Arial,sans-serif" font-size="10" fill="#d32f2f">Bollworm larva</text>
+</svg>

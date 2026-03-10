@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9"/>
+      <stop offset="100%" style="stop-color:#c8e6c9"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- Leaf -->
+  <path d="M80 250 Q200 20 350 120 Q200 80 80 250Z" fill="#4caf50" opacity="0.7"/>
+  <path d="M80 250 Q200 60 350 120" fill="none" stroke="#388e3c" stroke-width="2"/>
+  <!-- Leaf veins -->
+  <line x1="180" y1="170" x2="250" y2="100" stroke="#388e3c" stroke-width="1" opacity="0.5"/>
+  <line x1="160" y1="190" x2="220" y2="130" stroke="#388e3c" stroke-width="1" opacity="0.5"/>
+  <line x1="200" y1="155" x2="280" y2="95" stroke="#388e3c" stroke-width="1" opacity="0.5"/>
+  <!-- Whiteflies (small white dots with wings) -->
+  <g fill="#fff" stroke="#ccc" stroke-width="0.5">
+    <ellipse cx="180" cy="130" rx="6" ry="4"/>
+    <ellipse cx="175" cy="127" rx="4" ry="6" transform="rotate(-20 175 127)"/>
+    <ellipse cx="185" cy="127" rx="4" ry="6" transform="rotate(20 185 127)"/>
+  </g>
+  <g fill="#fff" stroke="#ccc" stroke-width="0.5">
+    <ellipse cx="220" cy="110" rx="6" ry="4"/>
+    <ellipse cx="215" cy="107" rx="4" ry="6" transform="rotate(-20 215 107)"/>
+    <ellipse cx="225" cy="107" rx="4" ry="6" transform="rotate(20 225 107)"/>
+  </g>
+  <g fill="#fff" stroke="#ccc" stroke-width="0.5">
+    <ellipse cx="250" cy="95" rx="5" ry="3"/>
+    <ellipse cx="246" cy="92" rx="3" ry="5" transform="rotate(-20 246 92)"/>
+    <ellipse cx="254" cy="92" rx="3" ry="5" transform="rotate(20 254 92)"/>
+  </g>
+  <g fill="#fff" stroke="#ccc" stroke-width="0.5">
+    <ellipse cx="200" cy="145" rx="5" ry="3"/>
+    <ellipse cx="196" cy="142" rx="3" ry="5" transform="rotate(-15 196 142)"/>
+    <ellipse cx="204" cy="142" rx="3" ry="5" transform="rotate(15 204 142)"/>
+  </g>
+  <!-- Aphids (small green/yellow dots) -->
+  <circle cx="160" cy="175" r="4" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+  <circle cx="155" cy="185" r="3.5" fill="#9ccc65" stroke="#689f38" stroke-width="1"/>
+  <circle cx="165" cy="182" r="3" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+  <circle cx="148" cy="192" r="3" fill="#aed581" stroke="#689f38" stroke-width="1"/>
+  <circle cx="170" cy="168" r="3.5" fill="#8bc34a" stroke="#689f38" stroke-width="1"/>
+  <!-- Yellow spots (damage) -->
+  <circle cx="190" cy="160" r="8" fill="#ffeb3b" opacity="0.4"/>
+  <circle cx="230" cy="120" r="6" fill="#ffeb3b" opacity="0.3"/>
+  <circle cx="150" cy="195" r="7" fill="#ffeb3b" opacity="0.35"/>
+  <!-- Labels -->
+  <rect x="10" y="10" width="120" height="24" rx="12" fill="#fff" opacity="0.9"/>
+  <text x="70" y="26" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#2e7d32">Whitefly / Aphids</text>
+  <!-- Indicator arrows -->
+  <line x1="300" y1="60" x2="255" y2="92" stroke="#d32f2f" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="310" y="55" font-family="Arial,sans-serif" font-size="10" fill="#d32f2f">Whiteflies</text>
+  <line x1="100" y1="220" x2="148" y2="192" stroke="#d32f2f" stroke-width="1.5"/>
+  <text x="50" y="232" font-family="Arial,sans-serif" font-size="10" fill="#d32f2f">Aphid cluster</text>
+  <line x1="280" y1="160" x2="235" y2="122" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="285" y="158" font-family="Arial,sans-serif" font-size="10" fill="#ff9800">Yellowing</text>
+</svg>

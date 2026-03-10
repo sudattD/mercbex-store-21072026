@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9"/>
+      <stop offset="40%" style="stop-color:#d7ccc8"/>
+      <stop offset="100%" style="stop-color:#a1887f"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- Soil line -->
+  <path d="M0 160 Q50 155 100 162 Q150 158 200 165 Q250 160 300 163 Q350 158 400 162 L400 300 L0 300Z" fill="#8d6e63"/>
+  <path d="M0 160 Q50 155 100 162 Q150 158 200 165 Q250 160 300 163 Q350 158 400 162" fill="none" stroke="#6d4c41" stroke-width="2"/>
+  <!-- Plant above soil -->
+  <rect x="195" y="80" width="6" height="82" fill="#66bb6a"/>
+  <path d="M198 80 Q210 60 220 70 Q210 75 198 80Z" fill="#81c784"/>
+  <path d="M198 95 Q185 75 175 85 Q185 88 198 95Z" fill="#81c784"/>
+  <path d="M198 110 Q215 95 222 105 Q212 108 198 110Z" fill="#81c784"/>
+  <!-- Wilting signs -->
+  <path d="M198 80 Q210 65 218 78" fill="none" stroke="#ffc107" stroke-width="1" opacity="0.6"/>
+  <path d="M175 85 Q180 78 185 82" fill="none" stroke="#ffc107" stroke-width="1" opacity="0.6"/>
+  <!-- Root system -->
+  <path d="M198 162 Q195 190 185 220" stroke="#a1887f" stroke-width="3" fill="none" opacity="0.7"/>
+  <path d="M198 162 Q205 195 215 225" stroke="#a1887f" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <path d="M198 162 Q190 180 175 200" stroke="#a1887f" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M198 162 Q210 185 225 205" stroke="#a1887f" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- Damaged roots (broken/eaten) -->
+  <circle cx="185" cy="210" r="3" fill="#d32f2f" opacity="0.5"/>
+  <circle cx="215" cy="218" r="3" fill="#d32f2f" opacity="0.5"/>
+  <!-- Termites in soil -->
+  <g fill="#f5deb3" stroke="#d2b48c" stroke-width="0.8">
+    <ellipse cx="150" cy="200" rx="6" ry="3"/>
+    <circle cx="157" cy="200" r="3"/>
+    <ellipse cx="230" cy="210" rx="5" ry="2.5"/>
+    <circle cx="236" cy="210" r="2.5"/>
+    <ellipse cx="170" cy="230" rx="5" ry="2.5"/>
+    <circle cx="176" cy="230" r="2.5"/>
+    <ellipse cx="250" cy="240" rx="6" ry="3"/>
+    <circle cx="257" cy="240" r="3"/>
+    <ellipse cx="130" cy="245" rx="5" ry="2.5"/>
+    <circle cx="136" cy="245" r="2.5"/>
+    <ellipse cx="200" cy="250" rx="5" ry="2.5"/>
+    <circle cx="206" cy="250" r="2.5"/>
+  </g>
+  <!-- Tunnel paths -->
+  <path d="M150 200 Q160 210 170 230" stroke="#bcaaa4" stroke-width="4" fill="none" opacity="0.4"/>
+  <path d="M230 210 Q220 225 200 250" stroke="#bcaaa4" stroke-width="4" fill="none" opacity="0.4"/>
+  <!-- Labels -->
+  <rect x="10" y="10" width="150" height="24" rx="12" fill="#fff" opacity="0.9"/>
+  <text x="85" y="26" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#5d4037">Termites / Soil Pests</text>
+  <!-- Indicators -->
+  <line x1="280" y1="195" x2="240" y2="210" stroke="#d32f2f" stroke-width="1.5"/>
+  <text x="285" y="193" font-family="Arial,sans-serif" font-size="10" fill="#d32f2f">Termites</text>
+  <line x1="280" y1="225" x2="250" y2="238" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="285" y="223" font-family="Arial,sans-serif" font-size="10" fill="#ff9800">Soil tunnels</text>
+  <text x="100" y="135" font-family="Arial,sans-serif" font-size="9" fill="#795548">Wilting plant</text>
+  <line x1="145" y1="132" x2="180" y2="112" stroke="#795548" stroke-width="1"/>
+</svg>

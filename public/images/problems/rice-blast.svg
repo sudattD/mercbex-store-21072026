@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f1f8e9"/>
+      <stop offset="100%" style="stop-color:#dcedc8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <!-- Rice leaf 1 -->
+  <path d="M60 280 Q80 150 100 50 Q110 150 120 280" fill="#81c784" stroke="#66bb6a" stroke-width="1"/>
+  <line x1="90" y1="60" x2="90" y2="280" stroke="#4caf50" stroke-width="1.5" opacity="0.5"/>
+  <!-- Diamond-shaped blast lesions on leaf 1 -->
+  <path d="M90 100 L100 115 L90 130 L80 115Z" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+  <path d="M90 108 L96 115 L90 122 L84 115Z" fill="#efebe9" opacity="0.6"/>
+  <path d="M85 160 L93 172 L85 184 L77 172Z" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+  <path d="M85 166 L90 172 L85 178 L80 172Z" fill="#efebe9" opacity="0.6"/>
+  <path d="M95 210 L103 222 L95 234 L87 222Z" fill="#795548" stroke="#5d4037" stroke-width="1"/>
+  <path d="M95 216 L100 222 L95 228 L90 222Z" fill="#efebe9" opacity="0.5"/>
+  <!-- Rice leaf 2 -->
+  <path d="M180 280 Q200 140 220 30 Q230 140 240 280" fill="#81c784" stroke="#66bb6a" stroke-width="1"/>
+  <line x1="210" y1="40" x2="210" y2="280" stroke="#4caf50" stroke-width="1.5" opacity="0.5"/>
+  <!-- Blast lesions on leaf 2 -->
+  <path d="M210 80 L220 95 L210 110 L200 95Z" fill="#a1887f" stroke="#6d4c41" stroke-width="1"/>
+  <path d="M210 87 L216 95 L210 103 L204 95Z" fill="#d7ccc8" opacity="0.6"/>
+  <path d="M215 150 L225 165 L215 180 L205 165Z" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+  <path d="M215 157 L221 165 L215 173 L209 165Z" fill="#efebe9" opacity="0.6"/>
+  <!-- Rice leaf 3 (healthy for comparison) -->
+  <path d="M300 280 Q320 150 340 60 Q350 150 360 280" fill="#66bb6a" stroke="#4caf50" stroke-width="1"/>
+  <line x1="330" y1="70" x2="330" y2="280" stroke="#388e3c" stroke-width="1.5" opacity="0.5"/>
+  <!-- Labels -->
+  <rect x="10" y="10" width="175" height="24" rx="12" fill="#fff" opacity="0.9"/>
+  <text x="97" y="26" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#5d4037">Rice Blast / Sheath Blight</text>
+  <!-- Indicators -->
+  <line x1="130" y1="115" x2="102" y2="115" stroke="#d32f2f" stroke-width="1.5"/>
+  <text x="133" y="112" font-family="Arial,sans-serif" font-size="9" fill="#d32f2f">Diamond lesion</text>
+  <text x="133" y="123" font-family="Arial,sans-serif" font-size="9" fill="#d32f2f">(gray center)</text>
+  <text x="305" y="140" font-family="Arial,sans-serif" font-size="9" fill="#388e3c">Healthy</text>
+  <text x="305" y="151" font-family="Arial,sans-serif" font-size="9" fill="#388e3c">leaf</text>
+  <line x1="325" y1="155" x2="330" y2="170" stroke="#388e3c" stroke-width="1"/>
+  <!-- Severity scale -->
+  <rect x="10" y="265" width="180" height="24" rx="8" fill="#fff" opacity="0.8"/>
+  <text x="18" y="281" font-family="Arial,sans-serif" font-size="9" fill="#666">Severity: </text>
+  <circle cx="80" cy="277" r="5" fill="#ffeb3b"/>
+  <text x="90" y="281" font-family="Arial,sans-serif" font-size="8" fill="#666">Early</text>
+  <circle cx="120" cy="277" r="5" fill="#ff9800"/>
+  <text x="130" y="281" font-family="Arial,sans-serif" font-size="8" fill="#666">Mid</text>
+  <circle cx="158" cy="277" r="5" fill="#d32f2f"/>
+  <text x="168" y="281" font-family="Arial,sans-serif" font-size="8" fill="#666">Late</text>
+</svg>
