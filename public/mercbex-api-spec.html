@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MERCBEX — API Specification</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+
+    @media print {
+      body { background: #fff; color: #111; padding: 20px; font-size: 11px; }
+      .page-break { page-break-before: always; }
+      .cover { background: #0d1f12 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      h1, h2, h3 { color: #111 !important; }
+      pre { background: #f5f5f5 !important; color: #333 !important; font-size: 10px; }
+      .method-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .api-card { border-color: #ddd !important; background: #fafafa !important; }
+      .note { background: #f0f7f0 !important; }
+    }
+
+    .cover {
+      background: linear-gradient(135deg, #0d1f12 0%, #1a3a20 100%);
+      border-radius: 16px;
+      padding: 80px 60px;
+      margin-bottom: 60px;
+      text-align: center;
+    }
+
+    .cover h1 { font-size: 42px; font-weight: 700; color: #4ade80; margin-bottom: 12px; }
+    .cover p { font-size: 18px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+    .cover .date { font-size: 14px; color: rgba(255,255,255,0.35); margin-top: 24px; }
+    .cover .badge { display: inline-block; background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; padding: 4px 16px; border-radius: 999px; font-size: 13px; margin-top: 16px; }
+
+    h2 {
+      font-size: 28px; font-weight: 700; color: #4ade80;
+      margin: 48px 0 24px; padding-bottom: 12px;
+      border-bottom: 2px solid #1a3a20;
+    }
+
+    h3 { font-size: 20px; font-weight: 600; color: #86efac; margin: 32px 0 16px; }
+
+    .toc { margin: 32px 0; }
+    .toc a {
+      display: block; color: #86efac; text-decoration: none;
+      padding: 8px 0; font-size: 16px; border-bottom: 1px solid #1a1a1a;
+    }
+    .toc a:hover { color: #4ade80; }
+    .toc a span { color: rgba(255,255,255,0.3); margin-right: 12px; }
+
+    .note {
+      background: #0d1f12; border-left: 3px solid #4ade80;
+      padding: 16px 20px; border-radius: 0 8px 8px 0;
+      margin: 16px 0; font-size: 14px; color: rgba(255,255,255,0.7);
+    }
+
+    .api-card {
+      background: #111; border: 1px solid #2a2a2a;
+      border-radius: 12px; padding: 24px; margin: 20px 0 36px;
+    }
+
+    .api-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 8px; flex-wrap: wrap;
+    }
+
+    .method-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      font-weight: 700; letter-spacing: 0.05em;
+    }
+
+    .method-badge.get { background: #0d2818; color: #4ade80; border: 1px solid #166534; }
+    .method-badge.post { background: #1e1b4b; color: #818cf8; border: 1px solid #3730a3; }
+    .method-badge.put { background: #1c1917; color: #fbbf24; border: 1px solid #92400e; }
+    .method-badge.delete { background: #1c0a0a; color: #f87171; border: 1px solid #991b1b; }
+    .method-badge.patch { background: #1a1000; color: #fb923c; border: 1px solid #9a3412; }
+
+    .api-path {
+      font-family: 'JetBrains Mono', monospace; font-size: 15px;
+      color: #fff; font-weight: 500;
+    }
+
+    .api-desc { color: rgba(255,255,255,0.5); font-size: 14px; margin: 8px 0 16px; }
+
+    .api-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #4ade80; margin: 16px 0 8px;
+    }
+
+    .api-section-label.response { color: #818cf8; }
+    .api-section-label.headers { color: #fbbf24; }
+    .api-section-label.params { color: #fb923c; }
+    .api-section-label.notes { color: #f87171; }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      line-height: 1.5; background: #0a0a0a; border: 1px solid #222;
+      border-radius: 8px; padding: 16px; overflow-x: auto; white-space: pre;
+    }
+
+    .param-table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+    .param-table th, .param-table td {
+      text-align: left; padding: 8px 12px; border-bottom: 1px solid #1a1a1a; font-size: 13px;
+    }
+    .param-table th { color: rgba(255,255,255,0.4); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .param-table td { color: #ccc; }
+    .param-table td code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4ade80; background: #0d1f12; padding: 2px 6px; border-radius: 4px; }
+    .param-table td .required { color: #f87171; font-size: 10px; font-weight: 700; }
+    .param-table td .optional { color: rgba(255,255,255,0.3); font-size: 10px; }
+
+    .status-code { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .status-code.s200 { background: #0d2818; color: #4ade80; }
+    .status-code.s201 { background: #0d2818; color: #4ade80; }
+    .status-code.s400 { background: #1c0a0a; color: #f87171; }
+    .status-code.s401 { background: #1c0a0a; color: #f87171; }
+    .status-code.s404 { background: #1a1000; color: #fb923c; }
+    .status-code.s500 { background: #1c0a0a; color: #f87171; }
+
+    .base-url {
+      font-family: 'JetBrains Mono', monospace; font-size: 14px;
+      color: #4ade80; background: #0d1f12; padding: 8px 16px;
+      border-radius: 8px; display: inline-block; margin: 8px 0;
+    }
+
+    .divider { border: none; border-top: 1px solid #1a1a1a; margin: 32px 0; }
+
+    /* User Story Cards */
+    .story-card {
+      background: #111; border: 1px solid #2a2a2a;
+      border-radius: 12px; padding: 24px; margin: 20px 0 36px;
+      border-left: 4px solid #4ade80;
+    }
+
+    .story-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 12px; flex-wrap: wrap;
+    }
+
+    .story-id {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      background: #0d1f12; color: #4ade80; padding: 3px 10px;
+      border-radius: 6px; font-weight: 600;
+    }
+
+    .story-priority {
+      font-size: 11px; font-weight: 700; padding: 3px 10px;
+      border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .story-priority.p0 { background: #450a0a; color: #f87171; }
+    .story-priority.p1 { background: #431407; color: #fb923c; }
+    .story-priority.p2 { background: #1c1917; color: #fbbf24; }
+    .story-priority.p3 { background: #0d2818; color: #4ade80; }
+
+    .story-epic {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 6px; background: #1e1b4b; color: #818cf8;
+    }
+
+    .story-title {
+      font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 8px;
+    }
+
+    .story-statement {
+      font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px;
+      line-height: 1.7; font-style: italic;
+      background: #0a0a0a; padding: 12px 16px; border-radius: 8px;
+    }
+    .story-statement strong { color: #4ade80; font-style: normal; }
+
+    .ac-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #fb923c; margin: 16px 0 8px;
+    }
+
+    .ac-list { list-style: none; margin: 0; padding: 0; }
+    .ac-list li {
+      font-size: 13px; color: rgba(255,255,255,0.7); padding: 6px 0 6px 24px;
+      position: relative; border-bottom: 1px solid #1a1a1a; line-height: 1.6;
+    }
+    .ac-list li:last-child { border-bottom: none; }
+    .ac-list li::before {
+      content: "✓"; position: absolute; left: 0; color: #4ade80;
+      font-weight: 700; font-size: 14px;
+    }
+
+    .story-apis {
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid #1a1a1a;
+    }
+    .story-apis-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: rgba(255,255,255,0.3); margin-bottom: 8px;
+    }
+    .story-api-tag {
+      display: inline-block; font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; background: #1a1a1a; color: #86efac;
+      padding: 3px 8px; border-radius: 4px; margin: 2px 4px 2px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER -->
+  <div class="cover">
+    <h1>MERCBEX Product Specification</h1>
+    <p>User Stories, Acceptance Criteria & API Reference</p>
+    <p>Crop Scanning, Diagnosis & E-Commerce Platform</p>
+    <div class="badge">Draft v1.0 — For Architecture Planning</div>
+    <div class="date">March 2026</div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <h2>Contents</h2>
+  <div class="toc">
+    <a href="#stories"><span>01</span> User Stories & Acceptance Criteria</a>
+    <a href="#general"><span>02</span> API — General Information</a>
+    <a href="#auth"><span>03</span> API — Authentication</a>
+    <a href="#crops"><span>04</span> API — Crops</a>
+    <a href="#scan"><span>05</span> API — AI Scan & Detection (Plantix)</a>
+    <a href="#diagnosis"><span>06</span> API — Diagnosis & History</a>
+    <a href="#products"><span>07</span> API — Products</a>
+    <a href="#cart"><span>08</span> API — Cart</a>
+    <a href="#orders"><span>09</span> API — Orders</a>
+    <a href="#user"><span>10</span> API — User Profile</a>
+  </div>
+
+  <!-- SECTION 1: USER STORIES -->
+  <div class="page-break"></div>
+  <h2 id="stories">01 — User Stories & Acceptance Criteria</h2>
+
+  <div class="note">
+    <strong>Format:</strong> As a [role], I want [action], so that [benefit].<br>
+    Each story includes acceptance criteria, priority, epic, and related API endpoints.
+  </div>
+
+  <!-- EPIC: AUTHENTICATION -->
+  <h3>Epic: Authentication & Onboarding</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-001</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Auth</span>
+    </div>
+    <div class="story-title">Phone Number Login via OTP</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> log in using my phone number and an OTP,<br>
+      <strong>so that</strong> I don't need to remember a password and can access the app easily.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Farmer enters a valid 10-digit Indian phone number with country code</li>
+      <li>System sends a 6-digit OTP to the phone number within 5 seconds</li>
+      <li>OTP expires after 5 minutes</li>
+      <li>Farmer can request a new OTP after 30 seconds (retry cooldown)</li>
+      <li>After 3 failed OTP attempts, the session is locked for 15 minutes</li>
+      <li>Successful verification returns access token + refresh token</li>
+      <li>If phone number is new, a user account is automatically created</li>
+      <li>Token persists across browser sessions (localStorage)</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /auth/send-otp</span>
+      <span class="story-api-tag">POST /auth/verify-otp</span>
+      <span class="story-api-tag">POST /auth/refresh</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-002</span>
+      <span class="story-priority p2">P2 — Medium</span>
+      <span class="story-epic">Auth</span>
+    </div>
+    <div class="story-title">Session Persistence & Auto-Logout</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> stay logged in when I return to the app,<br>
+      <strong>so that</strong> I don't have to log in every time I open it.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Access token is valid for 24 hours</li>
+      <li>Refresh token is valid for 30 days</li>
+      <li>App silently refreshes the access token using the refresh token when expired</li>
+      <li>If refresh token expires, redirect to login screen</li>
+      <li>Logout invalidates both tokens server-side</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /auth/refresh</span>
+      <span class="story-api-tag">POST /auth/logout</span>
+    </div>
+  </div>
+
+  <!-- EPIC: CROP SELECTION -->
+  <div class="page-break"></div>
+  <h3>Epic: Crop Selection</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-003</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Crops</span>
+    </div>
+    <div class="story-title">Select My Crop</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> select which crop I'm growing from a visual grid,<br>
+      <strong>so that</strong> the AI scanner knows what to look for when I scan.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Crop grid displays all supported crops with thumbnail images</li>
+      <li>Crops are organized in tiers: Tier 1 (featured), Tier 2 (secondary), Tier 3 (other)</li>
+      <li>Each crop card shows name, image, and top 2 disease tags</li>
+      <li>Only ONE crop can be selected at a time</li>
+      <li>Selected crop persists in local storage across sessions</li>
+      <li>Changing crop from home page and navigating to scanner starts a fresh scan</li>
+      <li>Previous incomplete scan is archived as "Incomplete" in My Diagnoses</li>
+      <li>Search bar allows filtering crops by name</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /crops</span>
+      <span class="story-api-tag">GET /crops/{crop_id}</span>
+    </div>
+  </div>
+
+  <!-- EPIC: AI SCANNING -->
+  <div class="page-break"></div>
+  <h3>Epic: AI Crop Scanning</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-004</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">Capture or Upload Crop Photo</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> take a photo of my crop using the camera or upload from gallery,<br>
+      <strong>so that</strong> the AI can analyze it for diseases.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Camera opens with live viewfinder on mobile devices</li>
+      <li>Capture button takes a photo and shows preview</li>
+      <li>Gallery upload accepts JPEG and PNG (max 10MB)</li>
+      <li>Image is compressed to thumbnail (320px, 50% quality) for session storage</li>
+      <li>Full-resolution image is uploaded to backend for analysis</li>
+      <li>Camera permission is requested on first use with clear explanation</li>
+      <li>If camera is denied, only gallery upload option is available</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /scan/analyze</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-005</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">AI Disease Analysis</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> see a progress indicator while my crop photo is being analyzed,<br>
+      <strong>so that</strong> I know the system is working and roughly how long it will take.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Progress bar shows 0-100% during analysis</li>
+      <li>Rotating status messages provide context ("Scanning leaf patterns...", "Checking for fungal infections...")</li>
+      <li>Scanned photo preview is visible during analysis</li>
+      <li>Analysis completes within 3-5 seconds (Plantix API SLA)</li>
+      <li>If Plantix returns poor image quality feedback (focus: "bad" or distance: "too_far"), show retake guidance</li>
+      <li>If Plantix API times out (>10s), show error with retry option</li>
+      <li>Results are saved to scan session immediately on completion</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /scan/analyze</span>
+      <span class="story-api-tag">Plantix POST /v2/image_analysis</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-006</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">View Diagnosis Results with Reference Images</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> see what diseases were detected in my crop, with reference images I can compare against my photo,<br>
+      <strong>so that</strong> I can validate whether the AI diagnosis is accurate.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Header shows total diseases detected (e.g., "3 issues detected in Rice")</li>
+      <li>Disease cards are sorted by severity: Critical → High → Medium → Low</li>
+      <li>Most severe disease card is auto-expanded; others are collapsed</li>
+      <li>Each expanded card shows: disease name, severity pill, likelihood badge</li>
+      <li>3 reference images from Plantix are displayed alongside the farmer's scanned photo</li>
+      <li>Symptoms are shown as a bullet list (from <code>symptoms_short</code>)</li>
+      <li>Cause/trigger is displayed</li>
+      <li>Preventive measures are listed</li>
+      <li>"Healthy" diagnosis (peat_id 999999) is filtered out — not shown as a disease</li>
+      <li>If crop_health is "healthy", show a success state instead of disease cards</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /scan/analyze (response)</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-007</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">Confirm Diagnosis & See Treatment</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> confirm that a detected disease matches my crop before seeing medicines,<br>
+      <strong>so that</strong> I only buy treatments for problems I actually have.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Each disease card has a "Confirm & See Treatment" button</li>
+      <li>Button is only visible BEFORE confirmation</li>
+      <li>Medicines/products are hidden until the farmer confirms</li>
+      <li>After clicking confirm, the card expands to show recommended products</li>
+      <li>Confirmation is saved to the scan session and backend</li>
+      <li>Confirmed diseases show a green checkmark on the card header</li>
+      <li>Each disease can be confirmed independently</li>
+      <li>A "Reject" option is also available if the farmer disagrees</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /scan/{scan_id}/confirm</span>
+      <span class="story-api-tag">POST /scan/{scan_id}/reject</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-007B</span>
+      <span class="story-priority p1">P1 — High</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">Reject a Diagnosis That Doesn't Match</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> reject a detected disease if it doesn't match my crop after comparing with reference images,<br>
+      <strong>so that</strong> I'm not shown irrelevant treatment recommendations and the AI can learn from my feedback.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>A "Reject" button is shown next to "Confirm & See Treatment" on each disease card</li>
+      <li>Clicking "Reject" shows a reason picker with options: "Doesn't match reference images", "Wrong crop detected", "Symptoms look different", "Other reason"</li>
+      <li>A "Cancel" link returns to the confirm/reject buttons without rejecting</li>
+      <li>After selecting a reason, the disease card is dimmed with reduced opacity and a strikethrough on the disease name</li>
+      <li>Rejected card shows a "Rejected" badge instead of severity pill</li>
+      <li>Rejected card cannot be expanded again</li>
+      <li>No medicines or prevention tips are shown for rejected diseases</li>
+      <li>Rejected diseases are NOT saved to My Diagnoses history (excluded from archive)</li>
+      <li>After rejecting, the next unresolved disease card auto-expands</li>
+      <li>Rejection is saved to the scan session in localStorage</li>
+      <li>Rejection reason is sent to the backend for AI feedback/training</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /scan/{scan_id}/reject</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-008</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Scanning</span>
+    </div>
+    <div class="story-title">Add Recommended Medicines to Cart</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> add recommended medicines to my cart with a specific quantity,<br>
+      <strong>so that</strong> I can purchase the right treatment for my crop disease.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Each recommended product shows: image, name, brand, price, dosage instructions</li>
+      <li>Quantity selector allows incrementing/decrementing (min: 1)</li>
+      <li>"Add to Cart" button adds the product with the selected quantity</li>
+      <li>After adding, button changes to "✓ Added" (green) to prevent duplicate adds</li>
+      <li>Cart item includes scan context: crop name, crop icon, disease name, severity, scan timestamp</li>
+      <li>Adding a product updates the scan status to "In Cart" in My Diagnoses</li>
+      <li>Both chemical and organic treatment options are shown when available</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /cart/items</span>
+    </div>
+  </div>
+
+  <!-- EPIC: MY DIAGNOSES -->
+  <div class="page-break"></div>
+  <h3>Epic: Diagnosis History & Session Management</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-009</span>
+      <span class="story-priority p1">P1 — High</span>
+      <span class="story-epic">Diagnoses</span>
+    </div>
+    <div class="story-title">View My Diagnosis History</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> see a list of all my past crop scans on the home page with their current status,<br>
+      <strong>so that</strong> I know which diagnoses still need action.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>"My Diagnoses" section appears on the home page only if scan history exists</li>
+      <li>Each card shows: crop icon, crop name, disease name, severity pill, time ago</li>
+      <li>Status pills: <strong style="color:#fb923c">Incomplete</strong> (left before confirming), <strong style="color:#f87171">Action Needed</strong> (confirmed but no medicines added), <strong style="color:#fbbf24">In Cart</strong> (medicines added to cart)</li>
+      <li>Cards are sorted by most recent first</li>
+      <li>Maximum 50 scan records are stored</li>
+      <li>Tapping a card navigates to /scan and resumes the session</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /scans</span>
+      <span class="story-api-tag">GET /scans/{scan_id}</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-010</span>
+      <span class="story-priority p1">P1 — High</span>
+      <span class="story-epic">Diagnoses</span>
+    </div>
+    <div class="story-title">Resume an Incomplete Scan</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> continue a scan from where I left off,<br>
+      <strong>so that</strong> I don't have to retake the photo and wait for analysis again.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Scan session is saved to localStorage on every state change</li>
+      <li>Session stores: selected crop, results, compressed image thumbnail, confirmed diseases, added products, quantities</li>
+      <li>When navigating to /scan, if a saved session exists for the SAME crop, it restores the last state</li>
+      <li>Photo, results, confirmations, and added products are all restored</li>
+      <li>If the saved session is for a DIFFERENT crop, it archives the old session and starts fresh</li>
+      <li>Archived sessions appear as "Incomplete" in My Diagnoses</li>
+      <li>Image is compressed to 320px/50% quality to fit localStorage limits</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /scans/{scan_id}</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-011</span>
+      <span class="story-priority p2">P2 — Medium</span>
+      <span class="story-epic">Diagnoses</span>
+    </div>
+    <div class="story-title">Scan Another Crop</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> start a new scan for a different crop after finishing one,<br>
+      <strong>so that</strong> I can diagnose multiple crops in one session.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>"Scan Another Crop" button is visible on the results page</li>
+      <li>Clicking it archives the current session (Incomplete/Action Needed/In Cart)</li>
+      <li>All scan state is cleared (photo, results, confirmations)</li>
+      <li>User returns to crop selection step</li>
+      <li>Previous scan appears in My Diagnoses on home page</li>
+    </ul>
+  </div>
+
+  <!-- EPIC: CART -->
+  <div class="page-break"></div>
+  <h3>Epic: Cart & Checkout</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-012</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Cart</span>
+    </div>
+    <div class="story-title">Cart Grouped by Crop with Scan Context</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> see my cart items grouped by crop, with clear info about which disease each medicine treats,<br>
+      <strong>so that</strong> I understand why each product was recommended and feel confident in my purchase.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Cart items from AI scan are grouped under crop headers (e.g., "🌾 Rice")</li>
+      <li>Each item shows: product name, price, quantity, crop icon + disease name + scan timestamp</li>
+      <li>Items added directly from Products page (no scan) appear under "Other Items"</li>
+      <li>Quantity can be updated with +/- buttons</li>
+      <li>Items can be removed individually</li>
+      <li>Cart total, subtotal, and discount are calculated correctly</li>
+      <li>Empty cart shows a CTA to scan a crop or browse products</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /cart</span>
+      <span class="story-api-tag">PATCH /cart/items/{id}</span>
+      <span class="story-api-tag">DELETE /cart/items/{id}</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-013</span>
+      <span class="story-priority p0">P0 — Critical</span>
+      <span class="story-epic">Cart</span>
+    </div>
+    <div class="story-title">Place an Order</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> place an order with my delivery address and payment method,<br>
+      <strong>so that</strong> the medicines are delivered to my village.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Checkout form collects: name, phone, address (line1, line2, district, state, pincode, landmark)</li>
+      <li>Cash on Delivery (COD) is the default payment method</li>
+      <li>Order confirmation shows: order ID, items summary, estimated delivery date</li>
+      <li>Cart is cleared after successful order placement</li>
+      <li>Scan status updates to "Completed" for associated diagnoses</li>
+      <li>Order confirmation is sent via SMS to the farmer's phone</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">POST /orders</span>
+      <span class="story-api-tag">POST /user/addresses</span>
+    </div>
+  </div>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-014</span>
+      <span class="story-priority p1">P1 — High</span>
+      <span class="story-epic">Cart</span>
+    </div>
+    <div class="story-title">Track My Order</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> see the delivery status of my order,<br>
+      <strong>so that</strong> I know when my medicines will arrive.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Order detail page shows: status (Confirmed → Packed → Shipped → Delivered), tracking number, carrier</li>
+      <li>Timeline shows each status event with timestamp</li>
+      <li>Estimated delivery date is displayed prominently</li>
+      <li>Order can be cancelled before shipping</li>
+      <li>Cancellation reason is collected (optional notes)</li>
+      <li>Order history shows which crops/diseases the medicines were for</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /orders</span>
+      <span class="story-api-tag">GET /orders/{order_id}</span>
+      <span class="story-api-tag">POST /orders/{order_id}/cancel</span>
+    </div>
+  </div>
+
+  <!-- EPIC: PRODUCTS -->
+  <div class="page-break"></div>
+  <h3>Epic: Product Catalog</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-015</span>
+      <span class="story-priority p1">P1 — High</span>
+      <span class="story-epic">Products</span>
+    </div>
+    <div class="story-title">Browse & Search Products</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> browse and search the product catalog by category, crop, or disease,<br>
+      <strong>so that</strong> I can find the right pesticide even without scanning.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Products page shows all products in a grid/list view</li>
+      <li>Filter by category: Insecticide, Fungicide, Herbicide, Growth Promoter, Organic</li>
+      <li>Filter by crop: shows only products relevant to selected crop</li>
+      <li>Filter by disease: shows only products that treat a specific disease</li>
+      <li>Search by product name or brand</li>
+      <li>Sort by: price, rating, popularity, newest</li>
+      <li>Each product card shows: image, name, brand, price (with discount if any), rating</li>
+      <li>Pagination or infinite scroll for large catalogs</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /products</span>
+      <span class="story-api-tag">GET /products/{product_id}</span>
+    </div>
+  </div>
+
+  <!-- EPIC: PROFILE -->
+  <h3>Epic: User Profile</h3>
+
+  <div class="story-card">
+    <div class="story-header">
+      <span class="story-id">US-016</span>
+      <span class="story-priority p2">P2 — Medium</span>
+      <span class="story-epic">Profile</span>
+    </div>
+    <div class="story-title">Manage My Profile & Addresses</div>
+    <div class="story-statement">
+      <strong>As a</strong> farmer,<br>
+      <strong>I want to</strong> update my name, language preference, and save delivery addresses,<br>
+      <strong>so that</strong> checkout is faster next time.
+    </div>
+    <div class="ac-label">Acceptance Criteria</div>
+    <ul class="ac-list">
+      <li>Profile shows: name, phone (read-only), email (optional), language, selected crops</li>
+      <li>Name and email are editable</li>
+      <li>Language preference affects app content (Hindi, English, Telugu, etc.)</li>
+      <li>Multiple delivery addresses can be saved</li>
+      <li>One address can be marked as default</li>
+      <li>Address fields: name, phone, line1, line2, district, state, pincode, landmark</li>
+      <li>Profile stats show: total scans, total orders, crops monitored</li>
+    </ul>
+    <div class="story-apis">
+      <div class="story-apis-label">Related APIs</div>
+      <span class="story-api-tag">GET /user/profile</span>
+      <span class="story-api-tag">PUT /user/profile</span>
+      <span class="story-api-tag">POST /user/addresses</span>
+      <span class="story-api-tag">GET /user/addresses</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h3>Story Summary</h3>
+  <table class="param-table">
+    <thead><tr><th>ID</th><th>Story</th><th>Epic</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td><code>US-001</code></td><td>Phone Number Login via OTP</td><td>Auth</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-002</code></td><td>Session Persistence & Auto-Logout</td><td>Auth</td><td><span class="story-priority p2">P2</span></td></tr>
+      <tr><td><code>US-003</code></td><td>Select My Crop</td><td>Crops</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-004</code></td><td>Capture or Upload Crop Photo</td><td>Scanning</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-005</code></td><td>AI Disease Analysis</td><td>Scanning</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-006</code></td><td>View Diagnosis Results with Reference Images</td><td>Scanning</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-007</code></td><td>Confirm Diagnosis & See Treatment</td><td>Scanning</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-007B</code></td><td>Reject a Diagnosis That Doesn't Match</td><td>Scanning</td><td><span class="story-priority p1">P1</span></td></tr>
+      <tr><td><code>US-008</code></td><td>Add Recommended Medicines to Cart</td><td>Scanning</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-009</code></td><td>View My Diagnosis History</td><td>Diagnoses</td><td><span class="story-priority p1">P1</span></td></tr>
+      <tr><td><code>US-010</code></td><td>Resume an Incomplete Scan</td><td>Diagnoses</td><td><span class="story-priority p1">P1</span></td></tr>
+      <tr><td><code>US-011</code></td><td>Scan Another Crop</td><td>Diagnoses</td><td><span class="story-priority p2">P2</span></td></tr>
+      <tr><td><code>US-012</code></td><td>Cart Grouped by Crop with Scan Context</td><td>Cart</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-013</code></td><td>Place an Order</td><td>Cart</td><td><span class="story-priority p0">P0</span></td></tr>
+      <tr><td><code>US-014</code></td><td>Track My Order</td><td>Cart</td><td><span class="story-priority p1">P1</span></td></tr>
+      <tr><td><code>US-015</code></td><td>Browse & Search Products</td><td>Products</td><td><span class="story-priority p1">P1</span></td></tr>
+      <tr><td><code>US-016</code></td><td>Manage My Profile & Addresses</td><td>Profile</td><td><span class="story-priority p2">P2</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 2: GENERAL (renumbered) -->
+  <div class="page-break"></div>
+  <h2 id="general">02 — General Information</h2>
+
+  <h3>Base URL</h3>
+  <div class="base-url">https://api.mercbex.com/v1</div>
+
+  <h3>Authentication</h3>
+  <div class="note">
+    All authenticated endpoints require a Bearer token in the Authorization header.<br>
+    Tokens are obtained via the <code>/auth/login</code> or <code>/auth/verify-otp</code> endpoints.
+  </div>
+
+  <div class="api-section-label headers">Standard Headers</div>
+  <pre>
+{
+  "Authorization": "Bearer &lt;access_token&gt;",
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "X-App-Version": "1.0.0",
+  "X-Platform": "web | android | ios"
+}</pre>
+
+  <h3>Standard Error Response</h3>
+  <pre>
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "The crop_id field is required.",
+    "field": "crop_id"
+  },
+  "timestamp": "2026-03-22T14:30:00.000Z"
+}</pre>
+
+  <h3>Pagination</h3>
+  <pre>
+// Request query params
+?page=1&limit=20&sort=created_at&order=desc
+
+// Response wrapper
+{
+  "success": true,
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 156,
+    "total_pages": 8,
+    "has_next": true,
+    "has_prev": false
+  }
+}</pre>
+
+
+  <!-- SECTION 2: AUTH -->
+  <div class="page-break"></div>
+  <h2 id="auth">03 — Authentication APIs</h2>
+
+  <div class="note">
+    Authentication is OTP-based (phone number). Farmers may not have email — phone is the primary identifier. Flow: Send OTP → Verify OTP → Get token.
+  </div>
+
+  <!-- Send OTP -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/auth/send-otp</span>
+    </div>
+    <div class="api-desc">Send OTP to farmer's phone number. Creates account if new user.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "phone": "+919876543210",
+  "country_code": "IN"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "phone": "+919876543210",
+    "otp_sent": true,
+    "expires_in": 300,
+    "is_new_user": false,
+    "retry_after": 30
+  }
+}</pre>
+  </div>
+
+  <!-- Verify OTP -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/auth/verify-otp</span>
+    </div>
+    <div class="api-desc">Verify OTP and return access + refresh tokens.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "phone": "+919876543210",
+  "otp": "482916"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "refresh_token": "dGhpcyBpcyBhIHJlZnJl...",
+    "expires_in": 86400,
+    "token_type": "Bearer",
+    "user": {
+      "id": "usr_a1b2c3d4",
+      "phone": "+919876543210",
+      "name": "Rajesh Kumar",
+      "is_new_user": false,
+      "created_at": "2026-01-15T08:30:00.000Z"
+    }
+  }
+}</pre>
+  </div>
+
+  <!-- Refresh Token -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/auth/refresh</span>
+    </div>
+    <div class="api-desc">Refresh an expired access token using the refresh token.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "refresh_token": "dGhpcyBpcyBhIHJlZnJl..."
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiIs...",
+    "expires_in": 86400
+  }
+}</pre>
+  </div>
+
+  <!-- Logout -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/auth/logout</span>
+    </div>
+    <div class="api-desc">Invalidate the current session and refresh token.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "refresh_token": "dGhpcyBpcyBhIHJlZnJl..."
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "message": "Logged out successfully."
+}</pre>
+  </div>
+
+
+  <!-- SECTION 3: CROPS -->
+  <div class="page-break"></div>
+  <h2 id="crops">04 — Crops APIs</h2>
+
+  <!-- List Crops -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/crops</span>
+    </div>
+    <div class="api-desc">Get all supported crops with their icons, disease tags, and tier information.</div>
+
+    <div class="api-section-label params">Query Parameters</div>
+    <table class="param-table">
+      <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>search</code></td><td>string <span class="optional">optional</span></td><td>Search crops by name</td></tr>
+        <tr><td><code>tier</code></td><td>1 | 2 | 3 <span class="optional">optional</span></td><td>Filter by crop tier</td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": [
+    {
+      "id": "crop_rice",
+      "name": "Rice (Paddy)",
+      "icon": "rice",
+      "image_url": "https://cdn.mercbex.com/crops/rice.jpg",
+      "tier": 1,
+      "common_diseases": [
+        { "name": "Brown Plant Hopper", "type": "pest" },
+        { "name": "Stem Borer", "type": "pest" }
+      ],
+      "disease_count": 12,
+      "is_active": true
+    },
+    {
+      "id": "crop_cotton",
+      "name": "Cotton",
+      "icon": "cotton",
+      "image_url": "https://cdn.mercbex.com/crops/cotton.jpg",
+      "tier": 1,
+      "common_diseases": [
+        { "name": "Bollworm", "type": "pest" },
+        { "name": "Whitefly", "type": "pest" }
+      ],
+      "disease_count": 8,
+      "is_active": true
+    }
+  ]
+}</pre>
+  </div>
+
+  <!-- Get Crop Details -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/crops/{crop_id}</span>
+    </div>
+    <div class="api-desc">Get detailed information for a specific crop, including all known diseases and recommended products.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "id": "crop_rice",
+    "name": "Rice (Paddy)",
+    "icon": "rice",
+    "image_url": "https://cdn.mercbex.com/crops/rice.jpg",
+    "description": "Staple cereal grain grown in flooded paddies...",
+    "tier": 1,
+    "growing_season": "June - November (Kharif)",
+    "diseases": [
+      {
+        "id": "dis_rice_blast",
+        "name": "Rice Blast",
+        "type": "fungal",
+        "severity_range": "medium-critical",
+        "description": "Caused by Magnaporthe oryzae fungus...",
+        "symptoms": [
+          "Diamond-shaped lesions on leaves",
+          "Gray-green spots with dark borders"
+        ],
+        "cause": "Magnaporthe oryzae fungus, spread by wind...",
+        "recommended_product_ids": ["prod_001", "prod_002"]
+      }
+    ],
+    "total_scans": 15420,
+    "most_common_disease": "Rice Blast"
+  }
+}</pre>
+  </div>
+
+
+  <!-- SECTION 4: SCAN -->
+  <div class="page-break"></div>
+  <h2 id="scan">05 — AI Scan & Detection APIs</h2>
+
+  <div class="note">
+    <strong>Architecture:</strong> The scan flow uses <strong>Plantix Vision API</strong> as the external AI engine. Our backend acts as a proxy — it receives the farmer's image, forwards it to Plantix, then enriches the Plantix response with our product catalog (treatment recommendations) before returning to the frontend.
+  </div>
+
+  <h3>4.1 — External: Plantix Vision API (3rd Party)</h3>
+
+  <div class="note">
+    <strong>Provider:</strong> Plantix by PEAT GmbH<br>
+    <strong>Docs:</strong> <code>https://plantix.stoplight.io/docs/api-reference</code><br>
+    <strong>Called by:</strong> MERCBEX Backend only (never from frontend — API key must stay server-side)
+  </div>
+
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">https://api.plantix.net/v2/image_analysis</span>
+    </div>
+    <div class="api-desc">Plantix crop disease image analysis. Called server-side by our backend when a farmer submits a scan.</div>
+
+    <div class="api-section-label headers">Request Headers</div>
+    <pre>
+{
+  "Authorization": "Bearer &lt;PLANTIX_API_KEY&gt;",
+  "Accept": "application/json",
+  "Accept-Language": "hi",
+  "Content-Type": "multipart/form-data"
+}</pre>
+
+    <div class="api-section-label notes">Accept-Language — Supported Languages (ISO 639-1)</div>
+    <table class="param-table">
+      <thead><tr><th>Code</th><th>Language</th><th>Code</th><th>Language</th></tr></thead>
+      <tbody>
+        <tr><td><code>ar</code></td><td>Arabic</td><td><code>ml</code></td><td>Malayalam</td></tr>
+        <tr><td><code>bn</code></td><td>Bengali</td><td><code>mr</code></td><td>Marathi</td></tr>
+        <tr><td><code>de</code></td><td>German</td><td><code>or</code></td><td>Oriya</td></tr>
+        <tr><td><code>en</code></td><td>English</td><td><code>pa</code></td><td>Panjabi</td></tr>
+        <tr><td><code>es</code></td><td>Spanish</td><td><code>pl</code></td><td>Polish</td></tr>
+        <tr><td><code>fr</code></td><td>French</td><td><code>pt</code></td><td>Portuguese</td></tr>
+        <tr><td><code>gu</code></td><td>Gujarati</td><td><code>sw</code></td><td>Swahili</td></tr>
+        <tr><td><code>hi</code></td><td>Hindi</td><td><code>ta</code></td><td>Tamil</td></tr>
+        <tr><td><code>id</code></td><td>Bahasa Indonesia</td><td><code>te</code></td><td>Telugu</td></tr>
+        <tr><td><code>kn</code></td><td>Kannada</td><td><code>ur</code></td><td>Urdu</td></tr>
+        <tr><td></td><td></td><td><code>vi</code></td><td>Vietnamese</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>Important:</strong> When <code>Accept-Language</code> is set, Plantix returns <code>common_name</code>, <code>symptoms</code>, <code>symptoms_short</code>, <code>preventive_measures</code>, <code>treatment_chemical</code>, and <code>treatment_organic</code> in the requested language. Our backend must pass the farmer's language preference (from their profile) when calling Plantix.
+    </div>
+
+    <div class="api-section-label">Request — <code>multipart/form-data</code></div>
+    <table class="param-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>image</code></td><td>File <span class="required">required</span></td><td>Crop photo (JPEG/PNG)</td></tr>
+        <tr><td><code>crop</code></td><td>string <span class="optional">optional</span></td><td>Crop name hint (e.g., "rice", "pepper", "tomato")</td></tr>
+        <tr><td><code>latitude</code></td><td>number <span class="optional">optional</span></td><td>GPS latitude for regional analysis</td></tr>
+        <tr><td><code>longitude</code></td><td>number <span class="optional">optional</span></td><td>GPS longitude for regional analysis</td></tr>
+        <tr><td><code>application_id</code></td><td>string <span class="optional">optional</span></td><td>MERCBEX app identifier</td></tr>
+        <tr><td><code>application_end_user_id</code></td><td>string <span class="optional">optional</span></td><td>MERCBEX user ID (anonymized)</td></tr>
+        <tr><td><code>application_used_image_gallery</code></td><td>boolean <span class="optional">optional</span></td><td><code>false</code> if camera, <code>true</code> if gallery upload</td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Plantix Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "crop_health": "unhealthy",
+  "crops": ["rice"],
+  "errors": [],
+  "image_feedback": {
+    "focus": "good",
+    "distance": "good"
+  },
+  "plantix_trace_id": "1-67891233-abcdef012345678912345678",
+  "predicted_diagnoses": [
+    {
+      "common_name": "Rice Blast",
+      "scientific_name": "Magnaporthe oryzae",
+      "diagnosis_likelihood": "very_likely",
+      "eppo_code": "PYRIOR",
+      "peat_id": 100123,
+      "pathogen_class": "fungus",
+      "trigger": "Magnaporthe oryzae",
+      "hosts": ["rice", "wheat", "barley"],
+      "symptoms": "Diamond-shaped lesions appear on leaves...",
+      "symptoms_short": [
+        "Diamond-shaped lesions on leaves",
+        "Gray-green spots with dark borders",
+        "Yellowing around infected areas",
+        "Nodes turn brownish-black",
+        "Panicle neck rot in severe cases"
+      ],
+      "image_references": [
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/abc123.jpg",
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/def456.jpg",
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/ghi789.jpg"
+      ],
+      "preventive_measures": [
+        "Use resistant varieties when available.",
+        "Ensure balanced fertilization, avoid excess nitrogen.",
+        "Maintain proper plant spacing for air circulation.",
+        "Remove infected crop residues after harvest.",
+        "Avoid overhead irrigation during susceptible stages."
+      ],
+      "treatment_chemical": "Apply Tricyclazole 75% WP (0.6g/L) or Isoprothiolane 40% EC (1.5ml/L) as foliar spray at first sign of infection. Repeat after 10-14 days if symptoms persist.",
+      "treatment_organic": "Apply neem oil spray (5ml/L) or Pseudomonas fluorescens (10g/L) as preventive treatment. Use Trichoderma viride for soil treatment."
+    },
+    {
+      "common_name": "Healthy",
+      "scientific_name": "Healthy",
+      "diagnosis_likelihood": "likely",
+      "eppo_code": null,
+      "peat_id": 999999,
+      "pathogen_class": "others",
+      "trigger": null,
+      "hosts": ["rice"],
+      "symptoms": "General healthy plant guidelines...",
+      "symptoms_short": [
+        "Dark green colored plant.",
+        "Firm leaves.",
+        "Well-shaped, good-colored grains.",
+        "Root system is well developed."
+      ],
+      "image_references": [
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/healthy1.jpg",
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/healthy2.jpg",
+        "https://content.peat-cloud.com/visualsearch/__w-100-200-400-600-800-1000__/healthy3.jpg"
+      ],
+      "preventive_measures": [
+        "Fertilize with balanced nutrient supply.",
+        "Do not over-water during the season.",
+        "Maintain plant diversity around fields."
+      ],
+      "treatment_chemical": null,
+      "treatment_organic": null
+    }
+  ]
+}</pre>
+
+    <div class="api-section-label notes">Key Plantix Response Fields</div>
+    <table class="param-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>crop_health</code></td><td>string</td><td><code>"healthy"</code> | <code>"unhealthy"</code></td></tr>
+        <tr><td><code>image_feedback.focus</code></td><td>string</td><td><code>"good"</code> | <code>"bad"</code> — if bad, ask farmer to retake</td></tr>
+        <tr><td><code>image_feedback.distance</code></td><td>string</td><td><code>"good"</code> | <code>"too_far"</code> | <code>"too_close"</code></td></tr>
+        <tr><td><code>diagnosis_likelihood</code></td><td>string</td><td><code>"very_likely"</code> | <code>"likely"</code> | <code>"possible"</code></td></tr>
+        <tr><td><code>pathogen_class</code></td><td>string</td><td><code>"fungus"</code> | <code>"bacteria"</code> | <code>"virus"</code> | <code>"pest"</code> | <code>"abiotic"</code> | <code>"others"</code></td></tr>
+        <tr><td><code>image_references</code></td><td>string[]</td><td>3 reference images from Plantix for farmer comparison</td></tr>
+        <tr><td><code>peat_id</code></td><td>number</td><td>Plantix internal disease ID. <code>999999</code> = healthy</td></tr>
+        <tr><td><code>treatment_chemical</code></td><td>string | null</td><td>Chemical treatment text (we map this to our product catalog)</td></tr>
+        <tr><td><code>treatment_organic</code></td><td>string | null</td><td>Organic treatment text</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <h3>4.2 — Internal: MERCBEX Scan Proxy API</h3>
+
+  <div class="note">
+    <strong>This is our API.</strong> The frontend calls this endpoint. Our backend handles Plantix communication, stores the scan, maps diseases to our product catalog, and returns an enriched response.
+  </div>
+
+  <!-- Upload & Scan -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/scan/analyze</span>
+    </div>
+    <div class="api-desc">Upload a crop image for AI analysis. Our backend forwards to Plantix, enriches with product recommendations, stores the scan record, and returns results.</div>
+
+    <div class="api-section-label">Request — <code>multipart/form-data</code></div>
+    <table class="param-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>image</code></td><td>File <span class="required">required</span></td><td>Crop photo (JPEG/PNG, max 10MB)</td></tr>
+        <tr><td><code>crop_id</code></td><td>string <span class="required">required</span></td><td>MERCBEX crop identifier (e.g., <code>"crop_rice"</code>)</td></tr>
+        <tr><td><code>latitude</code></td><td>number <span class="optional">optional</span></td><td>GPS latitude for regional analysis</td></tr>
+        <tr><td><code>longitude</code></td><td>number <span class="optional">optional</span></td><td>GPS longitude for regional analysis</td></tr>
+        <tr><td><code>used_gallery</code></td><td>boolean <span class="optional">optional</span></td><td>Whether image was from gallery (default: false)</td></tr>
+        <tr><td><code>language</code></td><td>string <span class="optional">optional</span></td><td>ISO 639-1 language code for localized results. Default: <code>"en"</code>. Passed as <code>Accept-Language</code> header to Plantix. Supported: <code>ar</code>, <code>bn</code>, <code>de</code>, <code>en</code>, <code>es</code>, <code>fr</code>, <code>gu</code>, <code>hi</code>, <code>id</code>, <code>kn</code>, <code>ml</code>, <code>mr</code>, <code>or</code>, <code>pa</code>, <code>pl</code>, <code>pt</code>, <code>sw</code>, <code>ta</code>, <code>te</code>, <code>ur</code>, <code>vi</code>. Falls back to user's profile language preference if not provided.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "scan_id": "scan_x7y8z9w0",
+    "plantix_trace_id": "1-67891233-abcdef012345678912345678",
+    "crop": {
+      "id": "crop_rice",
+      "name": "Rice (Paddy)",
+      "icon": "rice"
+    },
+    "crop_health": "unhealthy",
+    "image_feedback": {
+      "focus": "good",
+      "distance": "good"
+    },
+    "scanned_image_url": "https://cdn.mercbex.com/scans/scan_x7y8z9w0.jpg",
+    "thumbnail_url": "https://cdn.mercbex.com/scans/scan_x7y8z9w0_thumb.jpg",
+    "diseases_detected": 2,
+    "results": [
+      {
+        "detection_id": "det_001",
+        "disease": {
+          "common_name": "Rice Blast",
+          "scientific_name": "Magnaporthe oryzae",
+          "pathogen_class": "fungus",
+          "peat_id": 100123,
+          "eppo_code": "PYRIOR"
+        },
+        "likelihood": "very_likely",
+        "severity": "critical",
+        "symptoms_short": [
+          "Diamond-shaped lesions on leaves",
+          "Gray-green spots with dark borders",
+          "Yellowing around infected areas",
+          "Nodes turn brownish-black"
+        ],
+        "symptoms_detail": "Diamond-shaped lesions appear on leaves...",
+        "cause": "Magnaporthe oryzae",
+        "reference_images": [
+          "https://content.peat-cloud.com/visualsearch/__w-600__/abc123.jpg",
+          "https://content.peat-cloud.com/visualsearch/__w-600__/def456.jpg",
+          "https://content.peat-cloud.com/visualsearch/__w-600__/ghi789.jpg"
+        ],
+        "preventive_measures": [
+          "Use resistant varieties when available.",
+          "Ensure balanced fertilization, avoid excess nitrogen.",
+          "Maintain proper plant spacing for air circulation."
+        ],
+        "treatment": {
+          "chemical": "Apply Tricyclazole 75% WP (0.6g/L) or Isoprothiolane 40% EC...",
+          "organic": "Apply neem oil spray (5ml/L) or Pseudomonas fluorescens..."
+        },
+        "recommended_products": [
+          {
+            "id": "prod_001",
+            "name": "Tricyclazole 75% WP",
+            "brand": "MERCBEX",
+            "price": 350,
+            "original_price": 420,
+            "currency": "INR",
+            "image_url": "https://cdn.mercbex.com/products/prod_001.jpg",
+            "dosage": "0.6g per litre of water",
+            "application": "Foliar spray at first sign of infection",
+            "in_stock": true
+          },
+          {
+            "id": "prod_002",
+            "name": "Isoprothiolane 40% EC",
+            "brand": "MERCBEX",
+            "price": 480,
+            "currency": "INR",
+            "image_url": "https://cdn.mercbex.com/products/prod_002.jpg",
+            "dosage": "1.5ml per litre of water",
+            "application": "Spray during tillering stage",
+            "in_stock": true
+          }
+        ]
+      }
+    ],
+    "scanned_at": "2026-03-22T14:30:00.000Z"
+  }
+}</pre>
+
+    <div class="api-section-label notes">Backend Processing Pipeline</div>
+    <pre>
+  Frontend                    MERCBEX Backend                  Plantix API
+  ────────                    ──────────────                  ───────────
+      │                            │                              │
+      │  POST /scan/analyze        │                              │
+      │  (image + crop_id)         │                              │
+      │ ─────────────────────────► │                              │
+      │                            │  POST /v2/image_analysis     │
+      │                            │  (image + crop + coords)     │
+      │                            │ ────────────────────────────►│
+      │                            │                              │
+      │                            │  Plantix Response            │
+      │                            │  (diagnoses + ref images)    │
+      │                            │ ◄────────────────────────────│
+      │                            │                              │
+      │                            │  ENRICHMENT:                 │
+      │                            │  1. Filter out "Healthy"     │
+      │                            │     if peat_id == 999999     │
+      │                            │  2. Map likelihood →         │
+      │                            │     severity                 │
+      │                            │  3. Map pathogen_class →     │
+      │                            │     MERCBEX product catalog  │
+      │                            │  4. Store scan record in DB  │
+      │                            │  5. Store image in CDN       │
+      │                            │                              │
+      │  Enriched Response         │                              │
+      │  (diagnoses + products)    │                              │
+      │ ◄───────────────────────── │                              │
+      │                            │                              │
+    </pre>
+
+    <div class="api-section-label notes">Mapping Rules</div>
+    <table class="param-table">
+      <thead><tr><th>Plantix Field</th><th>MERCBEX Field</th><th>Mapping Logic</th></tr></thead>
+      <tbody>
+        <tr><td><code>diagnosis_likelihood</code></td><td><code>severity</code></td><td><code>very_likely</code> → critical/high, <code>likely</code> → high/medium, <code>possible</code> → medium/low</td></tr>
+        <tr><td><code>pathogen_class</code></td><td>Product category filter</td><td><code>fungus</code> → fungicides, <code>pest</code> → insecticides, <code>abiotic</code> → growth promoters</td></tr>
+        <tr><td><code>peat_id</code></td><td>Disease mapping</td><td>Map Plantix disease IDs to MERCBEX product catalog</td></tr>
+        <tr><td><code>image_references</code></td><td><code>reference_images</code></td><td>Pass through, replace <code>__w-100-200-400-600-800-1000__</code> with <code>__w-600__</code> for optimal size</td></tr>
+        <tr><td><code>peat_id == 999999</code></td><td>—</td><td>Filter out — this means "Healthy", don't show as disease</td></tr>
+        <tr><td><code>image_feedback.focus == "bad"</code></td><td>—</td><td>Return error asking farmer to retake photo</td></tr>
+        <tr><td><code>language</code> (from request)</td><td><code>Accept-Language</code> header</td><td>Pass farmer's language preference to Plantix. Disease names, symptoms, treatment text returned in that language. Fall back to user profile language, then <code>"en"</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Image Quality Check -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/scan/analyze</span>
+    </div>
+    <div class="api-desc">When Plantix returns poor image quality feedback, our API returns an error with guidance.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s400">400 Bad Request</span> (poor image quality)</div>
+    <pre>
+{
+  "success": false,
+  "error": {
+    "code": "IMAGE_QUALITY_POOR",
+    "message": "The photo is too blurry. Please retake with better focus.",
+    "image_feedback": {
+      "focus": "bad",
+      "distance": "too_far"
+    },
+    "suggestions": [
+      "Hold the camera steady and closer to the affected area",
+      "Ensure good lighting — avoid shadows",
+      "Focus on 2-3 affected leaves"
+    ]
+  }
+}</pre>
+  </div>
+
+  <hr class="divider">
+
+  <h3>4.3 — Confirm / Reject Diagnosis</h3>
+
+  <!-- Confirm Diagnosis -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/scan/{scan_id}/confirm</span>
+    </div>
+    <div class="api-desc">Farmer confirms a detected disease after comparing their photo with Plantix reference images. Unlocks treatment recommendations and updates scan status.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "detection_id": "det_001",
+  "confirmed": true,
+  "farmer_notes": "Matches exactly with reference image 2"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "scan_id": "scan_x7y8z9w0",
+    "detection_id": "det_001",
+    "status": "confirmed",
+    "confirmed_at": "2026-03-22T14:31:00.000Z",
+    "treatment_unlocked": true
+  }
+}</pre>
+  </div>
+
+  <!-- Reject Diagnosis -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/scan/{scan_id}/reject</span>
+    </div>
+    <div class="api-desc">Farmer rejects a detected disease — their crop doesn't match the reference images. Used as negative feedback for improving future results.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "detection_id": "det_002",
+  "reason": "does_not_match",
+  "farmer_notes": "My crop looks different from reference images"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "scan_id": "scan_x7y8z9w0",
+    "detection_id": "det_002",
+    "status": "rejected",
+    "rejected_at": "2026-03-22T14:31:30.000Z"
+  }
+}</pre>
+  </div>
+
+
+  <!-- SECTION 5: DIAGNOSIS HISTORY -->
+  <div class="page-break"></div>
+  <h2 id="diagnosis">06 — Diagnosis & History APIs</h2>
+
+  <!-- List Scan History -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/scans</span>
+    </div>
+    <div class="api-desc">Get the user's scan history with status information. Powers the "My Diagnoses" section on the home page.</div>
+
+    <div class="api-section-label params">Query Parameters</div>
+    <table class="param-table">
+      <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>status</code></td><td>string <span class="optional">optional</span></td><td>Filter: <code>incomplete</code> | <code>confirmed</code> | <code>in_cart</code> | <code>completed</code></td></tr>
+        <tr><td><code>crop_id</code></td><td>string <span class="optional">optional</span></td><td>Filter by crop</td></tr>
+        <tr><td><code>limit</code></td><td>number <span class="optional">optional</span></td><td>Default 20, max 50</td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": [
+    {
+      "scan_id": "scan_x7y8z9w0",
+      "crop": {
+        "id": "crop_rice",
+        "name": "Rice (Paddy)",
+        "icon": "rice"
+      },
+      "diseases": [
+        {
+          "detection_id": "det_001",
+          "name": "Rice Blast",
+          "severity": "critical",
+          "confidence": 94.2,
+          "status": "in_cart",
+          "confirmed_at": "2026-03-22T14:31:00.000Z"
+        },
+        {
+          "detection_id": "det_002",
+          "name": "Sheath Blight",
+          "severity": "high",
+          "confidence": 87.1,
+          "status": "incomplete",
+          "confirmed_at": null
+        }
+      ],
+      "thumbnail_url": "https://cdn.mercbex.com/scans/scan_x7y8z9w0_thumb.jpg",
+      "scanned_at": "2026-03-22T14:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 5,
+    "total_pages": 1
+  }
+}</pre>
+  </div>
+
+  <!-- Get Single Scan Detail -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/scans/{scan_id}</span>
+    </div>
+    <div class="api-desc">Get full details of a specific scan, including all detections, confirmations, and treatment status. Used to resume an incomplete scan.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "scan_id": "scan_x7y8z9w0",
+    "crop": { "id": "crop_rice", "name": "Rice (Paddy)", "icon": "rice" },
+    "scanned_image_url": "https://cdn.mercbex.com/scans/scan_x7y8z9w0.jpg",
+    "thumbnail_url": "https://cdn.mercbex.com/scans/scan_x7y8z9w0_thumb.jpg",
+    "results": [
+      {
+        "detection_id": "det_001",
+        "disease_name": "Rice Blast",
+        "severity": "critical",
+        "confidence": 94.2,
+        "status": "confirmed",
+        "confirmed_at": "2026-03-22T14:31:00.000Z",
+        "products_added_to_cart": ["prod_001"],
+        "reference_images": ["...", "...", "..."],
+        "symptoms": ["..."],
+        "cause": "...",
+        "recommended_products": [{ "..." }]
+      }
+    ],
+    "overall_status": "in_progress",
+    "scanned_at": "2026-03-22T14:30:00.000Z",
+    "location": {
+      "latitude": 17.3850,
+      "longitude": 78.4867,
+      "region": "Hyderabad, Telangana"
+    }
+  }
+}</pre>
+  </div>
+
+  <!-- Delete Scan -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge delete">DELETE</span>
+      <span class="api-path">/scans/{scan_id}</span>
+    </div>
+    <div class="api-desc">Delete a scan from user's history.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "message": "Scan deleted successfully."
+}</pre>
+  </div>
+
+
+  <!-- SECTION 6: PRODUCTS -->
+  <div class="page-break"></div>
+  <h2 id="products">07 — Products APIs</h2>
+
+  <!-- List Products -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/products</span>
+    </div>
+    <div class="api-desc">Get product catalog with filtering and search.</div>
+
+    <div class="api-section-label params">Query Parameters</div>
+    <table class="param-table">
+      <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>search</code></td><td>string <span class="optional">optional</span></td><td>Search by name or brand</td></tr>
+        <tr><td><code>category</code></td><td>string <span class="optional">optional</span></td><td><code>insecticide</code> | <code>fungicide</code> | <code>herbicide</code> | <code>growth_promoter</code> | <code>organic</code></td></tr>
+        <tr><td><code>crop_id</code></td><td>string <span class="optional">optional</span></td><td>Products relevant to a specific crop</td></tr>
+        <tr><td><code>disease_id</code></td><td>string <span class="optional">optional</span></td><td>Products that treat a specific disease</td></tr>
+        <tr><td><code>min_price</code></td><td>number <span class="optional">optional</span></td><td>Min price filter (INR)</td></tr>
+        <tr><td><code>max_price</code></td><td>number <span class="optional">optional</span></td><td>Max price filter (INR)</td></tr>
+        <tr><td><code>sort</code></td><td>string <span class="optional">optional</span></td><td><code>price</code> | <code>rating</code> | <code>popularity</code> | <code>newest</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": [
+    {
+      "id": "prod_001",
+      "name": "Tricyclazole 75% WP",
+      "brand": "MERCBEX",
+      "category": "fungicide",
+      "price": 350,
+      "original_price": 420,
+      "currency": "INR",
+      "discount_percent": 17,
+      "image_url": "https://cdn.mercbex.com/products/prod_001.jpg",
+      "images": [
+        "https://cdn.mercbex.com/products/prod_001_1.jpg",
+        "https://cdn.mercbex.com/products/prod_001_2.jpg"
+      ],
+      "rating": 4.5,
+      "review_count": 128,
+      "in_stock": true,
+      "stock_quantity": 45,
+      "unit": "250g pack",
+      "tags": ["bestseller", "government_approved"],
+      "treats_diseases": ["dis_rice_blast", "dis_leaf_blight"],
+      "suitable_crops": ["crop_rice", "crop_wheat"]
+    }
+  ],
+  "pagination": { "..." }
+}</pre>
+  </div>
+
+  <!-- Get Product Detail -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/products/{product_id}</span>
+    </div>
+    <div class="api-desc">Get full product details including dosage, application instructions, and reviews.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "id": "prod_001",
+    "name": "Tricyclazole 75% WP",
+    "brand": "MERCBEX",
+    "category": "fungicide",
+    "price": 350,
+    "original_price": 420,
+    "currency": "INR",
+    "image_url": "https://cdn.mercbex.com/products/prod_001.jpg",
+    "images": ["...", "..."],
+    "description": "Systemic fungicide for control of rice blast...",
+    "dosage": "0.6g per litre of water",
+    "application_method": "Foliar spray at first sign of infection",
+    "precautions": [
+      "Wear protective equipment during application",
+      "Do not apply during flowering",
+      "Withholding period: 21 days before harvest"
+    ],
+    "active_ingredients": [
+      { "name": "Tricyclazole", "concentration": "75%", "type": "WP" }
+    ],
+    "registration_number": "CIB-2024-F-0451",
+    "manufacturer": "MERCBEX Agrochemicals Pvt Ltd",
+    "shelf_life": "2 years from manufacturing",
+    "rating": 4.5,
+    "review_count": 128,
+    "reviews": [
+      {
+        "id": "rev_001",
+        "user_name": "Farmer Ramesh",
+        "rating": 5,
+        "comment": "Very effective against rice blast. Saw results in 3 days.",
+        "crop": "Rice",
+        "disease": "Rice Blast",
+        "created_at": "2026-02-10T10:00:00.000Z"
+      }
+    ],
+    "treats_diseases": [
+      { "id": "dis_rice_blast", "name": "Rice Blast" },
+      { "id": "dis_leaf_blight", "name": "Leaf Blight" }
+    ],
+    "suitable_crops": [
+      { "id": "crop_rice", "name": "Rice (Paddy)" },
+      { "id": "crop_wheat", "name": "Wheat" }
+    ],
+    "in_stock": true,
+    "stock_quantity": 45
+  }
+}</pre>
+  </div>
+
+
+  <!-- SECTION 7: CART -->
+  <div class="page-break"></div>
+  <h2 id="cart">08 — Cart APIs</h2>
+
+  <div class="note">
+    Cart items from AI scan carry <code>scan_context</code> — this groups items by crop in the cart UI and gives the farmer confidence about why a product was recommended.
+  </div>
+
+  <!-- Get Cart -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/cart</span>
+    </div>
+    <div class="api-desc">Get the user's current cart, grouped by crop context.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "id": "cart_abc123",
+    "items": [
+      {
+        "cart_item_id": "ci_001",
+        "product": {
+          "id": "prod_001",
+          "name": "Tricyclazole 75% WP",
+          "brand": "MERCBEX",
+          "price": 350,
+          "image_url": "https://cdn.mercbex.com/products/prod_001.jpg",
+          "in_stock": true
+        },
+        "quantity": 2,
+        "subtotal": 700,
+        "scan_context": {
+          "scan_id": "scan_x7y8z9w0",
+          "crop": "Rice (Paddy)",
+          "crop_icon": "rice",
+          "disease": "Rice Blast",
+          "severity": "critical",
+          "scanned_at": "2026-03-22T14:30:00.000Z"
+        }
+      },
+      {
+        "cart_item_id": "ci_002",
+        "product": {
+          "id": "prod_010",
+          "name": "Neem Oil 1L",
+          "brand": "MERCBEX",
+          "price": 150,
+          "image_url": "https://cdn.mercbex.com/products/prod_010.jpg",
+          "in_stock": true
+        },
+        "quantity": 3,
+        "subtotal": 450,
+        "scan_context": null
+      }
+    ],
+    "summary": {
+      "total_items": 5,
+      "subtotal": 1150,
+      "discount": 70,
+      "delivery_fee": 0,
+      "total": 1080,
+      "currency": "INR"
+    },
+    "grouped_by_crop": [
+      {
+        "crop": "Rice (Paddy)",
+        "crop_icon": "rice",
+        "item_ids": ["ci_001"]
+      },
+      {
+        "crop": null,
+        "crop_icon": null,
+        "label": "Other Items",
+        "item_ids": ["ci_002"]
+      }
+    ]
+  }
+}</pre>
+  </div>
+
+  <!-- Add to Cart -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/cart/items</span>
+    </div>
+    <div class="api-desc">Add a product to cart. Include scan_context when adding from diagnosis results.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "product_id": "prod_001",
+  "quantity": 2,
+  "scan_context": {
+    "scan_id": "scan_x7y8z9w0",
+    "crop": "Rice (Paddy)",
+    "crop_icon": "rice",
+    "disease": "Rice Blast",
+    "severity": "critical",
+    "scanned_at": "2026-03-22T14:30:00.000Z"
+  }
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s201">201 Created</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "cart_item_id": "ci_001",
+    "product_id": "prod_001",
+    "quantity": 2,
+    "subtotal": 700,
+    "cart_total": 700,
+    "message": "Added to cart"
+  }
+}</pre>
+  </div>
+
+  <!-- Update Cart Item -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge patch">PATCH</span>
+      <span class="api-path">/cart/items/{cart_item_id}</span>
+    </div>
+    <div class="api-desc">Update quantity of a cart item.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "quantity": 3
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "cart_item_id": "ci_001",
+    "quantity": 3,
+    "subtotal": 1050,
+    "cart_total": 1500
+  }
+}</pre>
+  </div>
+
+  <!-- Remove Cart Item -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge delete">DELETE</span>
+      <span class="api-path">/cart/items/{cart_item_id}</span>
+    </div>
+    <div class="api-desc">Remove an item from the cart.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "removed_item_id": "ci_001",
+    "cart_total": 450
+  }
+}</pre>
+  </div>
+
+  <!-- Clear Cart -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge delete">DELETE</span>
+      <span class="api-path">/cart</span>
+    </div>
+    <div class="api-desc">Clear all items from the cart.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "message": "Cart cleared."
+}</pre>
+  </div>
+
+
+  <!-- SECTION 8: ORDERS -->
+  <div class="page-break"></div>
+  <h2 id="orders">09 — Orders APIs</h2>
+
+  <!-- Create Order -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/orders</span>
+    </div>
+    <div class="api-desc">Create an order from the current cart. Initiates payment flow.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "delivery_address": {
+    "name": "Rajesh Kumar",
+    "phone": "+919876543210",
+    "line1": "Village Kothapally",
+    "line2": "Near Gram Panchayat Office",
+    "district": "Rangareddy",
+    "state": "Telangana",
+    "pincode": "501505",
+    "landmark": "Behind Krishna Temple"
+  },
+  "payment_method": "cod",
+  "coupon_code": "FIRST50",
+  "notes": "Please deliver before 10 AM"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s201">201 Created</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "order_id": "ord_m1n2o3p4",
+    "status": "confirmed",
+    "items": [
+      {
+        "product_id": "prod_001",
+        "name": "Tricyclazole 75% WP",
+        "quantity": 2,
+        "price": 350,
+        "subtotal": 700,
+        "scan_context": {
+          "crop": "Rice (Paddy)",
+          "disease": "Rice Blast",
+          "scanned_at": "2026-03-22T14:30:00.000Z"
+        }
+      }
+    ],
+    "summary": {
+      "subtotal": 1150,
+      "discount": 70,
+      "coupon_discount": 50,
+      "delivery_fee": 0,
+      "total": 1030,
+      "currency": "INR"
+    },
+    "delivery_address": { "..." },
+    "payment": {
+      "method": "cod",
+      "status": "pending"
+    },
+    "estimated_delivery": "2026-03-24T18:00:00.000Z",
+    "created_at": "2026-03-22T15:00:00.000Z"
+  }
+}</pre>
+  </div>
+
+  <!-- List Orders -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/orders</span>
+    </div>
+    <div class="api-desc">Get user's order history.</div>
+
+    <div class="api-section-label params">Query Parameters</div>
+    <table class="param-table">
+      <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>status</code></td><td>string <span class="optional">optional</span></td><td><code>confirmed</code> | <code>shipped</code> | <code>delivered</code> | <code>cancelled</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": [
+    {
+      "order_id": "ord_m1n2o3p4",
+      "status": "shipped",
+      "item_count": 3,
+      "total": 1030,
+      "currency": "INR",
+      "payment_method": "cod",
+      "estimated_delivery": "2026-03-24T18:00:00.000Z",
+      "tracking_number": "MERC20260322001",
+      "created_at": "2026-03-22T15:00:00.000Z",
+      "crops_treated": ["Rice (Paddy)", "Potato"]
+    }
+  ],
+  "pagination": { "..." }
+}</pre>
+  </div>
+
+  <!-- Get Order Detail -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/orders/{order_id}</span>
+    </div>
+    <div class="api-desc">Get full details of a specific order including delivery tracking.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "order_id": "ord_m1n2o3p4",
+    "status": "shipped",
+    "items": [
+      {
+        "product_id": "prod_001",
+        "name": "Tricyclazole 75% WP",
+        "quantity": 2,
+        "price": 350,
+        "subtotal": 700,
+        "scan_context": {
+          "crop": "Rice (Paddy)",
+          "disease": "Rice Blast",
+          "scan_id": "scan_x7y8z9w0",
+          "scanned_at": "2026-03-22T14:30:00.000Z"
+        }
+      }
+    ],
+    "summary": {
+      "subtotal": 1150,
+      "discount": 70,
+      "coupon_discount": 50,
+      "delivery_fee": 0,
+      "total": 1030,
+      "currency": "INR"
+    },
+    "delivery_address": { "..." },
+    "payment": {
+      "method": "cod",
+      "status": "pending",
+      "paid_at": null
+    },
+    "tracking": {
+      "tracking_number": "MERC20260322001",
+      "carrier": "Delhivery",
+      "tracking_url": "https://track.delhivery.com/MERC20260322001",
+      "events": [
+        { "status": "confirmed", "timestamp": "2026-03-22T15:00:00.000Z", "message": "Order confirmed" },
+        { "status": "packed", "timestamp": "2026-03-22T18:00:00.000Z", "message": "Order packed at warehouse" },
+        { "status": "shipped", "timestamp": "2026-03-23T08:00:00.000Z", "message": "Shipped via Delhivery" }
+      ]
+    },
+    "estimated_delivery": "2026-03-24T18:00:00.000Z",
+    "created_at": "2026-03-22T15:00:00.000Z"
+  }
+}</pre>
+  </div>
+
+  <!-- Cancel Order -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/orders/{order_id}/cancel</span>
+    </div>
+    <div class="api-desc">Cancel an order. Only allowed before shipping.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "reason": "found_alternative",
+  "notes": "Got medicine from local store"
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "order_id": "ord_m1n2o3p4",
+    "status": "cancelled",
+    "cancelled_at": "2026-03-22T16:00:00.000Z",
+    "refund_status": "not_applicable"
+  }
+}</pre>
+  </div>
+
+
+  <!-- SECTION 9: USER PROFILE -->
+  <div class="page-break"></div>
+  <h2 id="user">10 — User Profile APIs</h2>
+
+  <!-- Get Profile -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/user/profile</span>
+    </div>
+    <div class="api-desc">Get the authenticated user's profile.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "id": "usr_a1b2c3d4",
+    "phone": "+919876543210",
+    "name": "Rajesh Kumar",
+    "email": "rajesh@gmail.com",
+    "avatar_url": null,
+    "language": "hi",
+    "selected_crops": [
+      { "id": "crop_rice", "name": "Rice (Paddy)" },
+      { "id": "crop_cotton", "name": "Cotton" }
+    ],
+    "default_address": {
+      "line1": "Village Kothapally",
+      "district": "Rangareddy",
+      "state": "Telangana",
+      "pincode": "501505"
+    },
+    "stats": {
+      "total_scans": 12,
+      "total_orders": 5,
+      "crops_monitored": 2
+    },
+    "created_at": "2026-01-15T08:30:00.000Z"
+  }
+}</pre>
+  </div>
+
+  <!-- Update Profile -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge put">PUT</span>
+      <span class="api-path">/user/profile</span>
+    </div>
+    <div class="api-desc">Update user profile information.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "name": "Rajesh Kumar",
+  "email": "rajesh.kumar@gmail.com",
+  "language": "hi",
+  "selected_crops": ["crop_rice", "crop_cotton", "crop_tomato"]
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "id": "usr_a1b2c3d4",
+    "name": "Rajesh Kumar",
+    "email": "rajesh.kumar@gmail.com",
+    "language": "hi",
+    "selected_crops": ["crop_rice", "crop_cotton", "crop_tomato"],
+    "updated_at": "2026-03-22T16:00:00.000Z"
+  }
+}</pre>
+  </div>
+
+  <!-- Save Address -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge post">POST</span>
+      <span class="api-path">/user/addresses</span>
+    </div>
+    <div class="api-desc">Add a new delivery address.</div>
+
+    <div class="api-section-label">Request Body</div>
+    <pre>
+{
+  "name": "Rajesh Kumar",
+  "phone": "+919876543210",
+  "line1": "Village Kothapally",
+  "line2": "Near Gram Panchayat Office",
+  "district": "Rangareddy",
+  "state": "Telangana",
+  "pincode": "501505",
+  "landmark": "Behind Krishna Temple",
+  "is_default": true
+}</pre>
+
+    <div class="api-section-label response">Response — <span class="status-code s201">201 Created</span></div>
+    <pre>
+{
+  "success": true,
+  "data": {
+    "address_id": "addr_001",
+    "is_default": true,
+    "created_at": "2026-03-22T16:00:00.000Z"
+  }
+}</pre>
+  </div>
+
+  <!-- Get Addresses -->
+  <div class="api-card">
+    <div class="api-header">
+      <span class="method-badge get">GET</span>
+      <span class="api-path">/user/addresses</span>
+    </div>
+    <div class="api-desc">Get all saved delivery addresses.</div>
+
+    <div class="api-section-label response">Response — <span class="status-code s200">200 OK</span></div>
+    <pre>
+{
+  "success": true,
+  "data": [
+    {
+      "address_id": "addr_001",
+      "name": "Rajesh Kumar",
+      "phone": "+919876543210",
+      "line1": "Village Kothapally",
+      "line2": "Near Gram Panchayat Office",
+      "district": "Rangareddy",
+      "state": "Telangana",
+      "pincode": "501505",
+      "landmark": "Behind Krishna Temple",
+      "is_default": true
+    }
+  ]
+}</pre>
+  </div>
+
+  <hr class="divider">
+
+  <div class="note">
+    <strong>Note for developers:</strong> This is a draft specification for architecture planning. Field names, types, and structures are indicative and should be refined during implementation. Consider adding WebSocket support for real-time scan progress instead of polling, and rate limiting on the scan endpoint to prevent abuse.
+  </div>
+
+  <hr class="divider">
+
+  <h2 id="admin">08 — Admin Dashboard (localStorage)</h2>
+  <p>The admin dashboard at <code>/admin</code> is a client-side management interface. It reads/writes the following localStorage keys:</p>
+
+  <table>
+    <thead><tr><th>Storage Key</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>mercbex_products_override</code></td><td><code>Product[]</code></td><td>Admin-edited products. Merges with the hardcoded catalog at runtime via <code>getProducts()</code>. Matching IDs override fields; new IDs append.</td></tr>
+      <tr><td><code>mercbex_store_settings</code></td><td><code>{ promoBanner: {...} }</code></td><td>Store-wide settings including the promo banner configuration (title, description, link, colors, enabled).</td></tr>
+      <tr><td><code>mercbex_crop_scans</code></td><td><code>ScanRecord[]</code></td><td>Diagnosis history from the AI Scanner. Read-only in the admin Scans tab.</td></tr>
+      <tr><td><code>order_MBX{id}</code></td><td><code>Order</code></td><td>Per-order records written by the checkout page. The admin Orders tab scans for all <code>order_</code> prefixed keys.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Product Override Interface</h3>
+  <pre>
+interface ProductOverride {
+  id: string;                   // Matches hardcoded ID to override, or new ID to append
+  name: string;
+  activeIngredient: string;
+  formulation: string;
+  category: "Insecticide" | "Fungicide" | "Herbicide" | "Rodenticide" | "Plant Growth Regulator";
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviewCount: number;
+  description: string;
+  targetPests: string[];
+  cropSuitability: string[];
+  dosage: string;
+  packSizes: string[];
+  features: string[];
+  inStock: boolean;
+  badge?: string;
+}
+  </pre>
+
+  <h3>Promo Banner Settings Interface</h3>
+  <pre>
+interface PromoBannerSettings {
+  enabled: boolean;
+  title: string;
+  description: string;
+  linkText: string;
+  linkUrl: string;
+  bgColor: string;      // hex color, e.g. "#166534"
+  textColor: string;    // hex color, e.g. "#ffffff"
+}
+  </pre>
+
+  <div style="text-align: center; margin-top: 48px; color: rgba(255,255,255,0.2); font-size: 13px;">
+    MERCBEX API Specification — Draft v1.0 — March 2026 — Updated 2026-07-21<br>
+    For internal use only
+  </div>
+
+</body>
+</html>
