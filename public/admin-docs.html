@@ -1,0 +1,364 @@
+<title>MERCBEX Admin — Users, Customers & Crop Scans: API & User Stories</title>
+<style>
+  :root {
+    --surface: #f5f0e8; --surface-card: #ffffff; --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a; --text-muted: #8a8a8a; --accent: #166534;
+    --accent-light: #e8f5e9; --accent-glow: rgba(22,101,52,0.08);
+    --line: #e0d8cc; --line-light: #eee8de; --code-bg: #faf8f4;
+    --tag-bg: #e8f5e9; --tag-text: #166534; --warning-bg: #fff3e0; --warning-text: #e65100;
+    --sidebar-bg: #0f172a; --sidebar-text: #94a3b8; --sidebar-active: #22c55e;
+    --font-display: Georgia, 'Times New Roman', serif;
+    --font-body: system-ui, -apple-system, sans-serif;
+    --font-code: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root {
+    --surface: #0f172a; --surface-card: #1e293b; --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8; --text-muted: #64748b; --accent: #22c55e;
+    --accent-light: #052e16; --accent-glow: rgba(34,197,94,0.06);
+    --line: #334155; --line-light: #1e293b; --code-bg: #1e293b;
+    --tag-bg: #052e16; --tag-text: #86efac; --warning-bg: #431407; --warning-text: #fdba74;
+    --sidebar-bg: #020617; --sidebar-text: #64748b; --sidebar-active: #4ade80;
+  } }
+  :root[data-theme="dark"] { --surface: #0f172a; --surface-card: #1e293b; --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8; --text-muted: #64748b; --accent: #22c55e; --accent-light: #052e16;
+    --accent-glow: rgba(34,197,94,0.06); --line: #334155; --line-light: #1e293b; --code-bg: #1e293b;
+    --tag-bg: #052e16; --tag-text: #86efac; --warning-bg: #431407; --warning-text: #fdba74;
+    --sidebar-bg: #020617; --sidebar-text: #64748b; --sidebar-active: #4ade80; }
+  :root[data-theme="light"] { --surface: #f5f0e8; --surface-card: #ffffff; --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a; --text-muted: #8a8a8a; --accent: #166534; --accent-light: #e8f5e9;
+    --accent-glow: rgba(22,101,52,0.08); --line: #e0d8cc; --line-light: #eee8de; --code-bg: #faf8f4;
+    --tag-bg: #e8f5e9; --tag-text: #166534; --warning-bg: #fff3e0; --warning-text: #e65100;
+    --sidebar-bg: #0f172a; --sidebar-text: #94a3b8; --sidebar-active: #22c55e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--surface); color: var(--text-primary); line-height: 1.7; padding: 0; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 1040px; margin: 0 auto; padding: 48px 24px 80px; }
+  .nav-bar { position: sticky; top: 0; z-index: 10; background: var(--sidebar-bg); padding: 0 24px; display: flex; align-items: center; gap: 6px; height: 52px; overflow-x: auto; scrollbar-width: none; }
+  .nav-bar::-webkit-scrollbar { display: none; }
+  .nav-bar a { color: var(--sidebar-text); text-decoration: none; font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 6px; white-space: nowrap; transition: all 0.15s; letter-spacing: 0.02em; }
+  .nav-bar a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .nav-bar a.active { color: var(--sidebar-active); background: rgba(34,197,94,0.1); }
+  h1 { font-family: var(--font-display); font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 4px; color: var(--text-primary); text-wrap: balance; }
+  .subtitle { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.5; }
+  h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--line); letter-spacing: -0.01em; }
+  h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-top: 32px; margin-bottom: 10px; }
+  h4 { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 24px; margin-bottom: 6px; }
+  p { margin-bottom: 14px; color: var(--text-secondary); font-size: 14px; }
+  strong { color: var(--text-primary); font-weight: 600; }
+  code { font-family: var(--font-code); font-size: 12.5px; background: var(--code-bg); padding: 1px 6px; border-radius: 4px; color: var(--text-primary); border: 1px solid var(--line-light); }
+  pre { font-family: var(--font-code); font-size: 12.5px; background: var(--code-bg); border: 1px solid var(--line-light); border-radius: 8px; padding: 16px 20px; overflow-x: auto; line-height: 1.6; margin-bottom: 20px; color: var(--text-primary); }
+  pre .comment { color: var(--text-muted); font-style: italic; }
+  pre .key { color: #7c3aed; }
+  pre .str { color: #059669; }
+  pre .type { color: #2563eb; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; font-variant-numeric: tabular-nums; }
+  th { background: var(--surface); text-align: left; padding: 10px 12px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--line); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--line-light); color: var(--text-secondary); }
+  td:first-child { font-weight: 500; color: var(--text-primary); font-family: var(--font-code); font-size: 12px; }
+  .card { background: var(--surface-card); border: 1px solid var(--line); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .card h3 { margin-top: 0; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; background: var(--tag-bg); color: var(--tag-text); letter-spacing: 0.02em; }
+  .tag.warn { background: var(--warning-bg); color: var(--warning-text); }
+  .story { background: var(--surface-card); border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; }
+  .story-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .story-id { font-family: var(--font-code); font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 1px 8px; border-radius: 4px; }
+  .story-title { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+  .story-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.6; }
+  .story-flow { font-size: 12px; color: var(--text-muted); margin-top: 6px; padding: 8px 12px; background: var(--accent-glow); border-radius: 6px; line-height: 1.5; }
+  .story-flow span { color: var(--accent); font-weight: 500; }
+  .section-divider { height: 2px; background: linear-gradient(90deg, var(--accent) 0%, transparent 100%); margin: 60px 0 40px; opacity: 0.3; }
+  @media (max-width: 640px) { .page { padding: 24px 16px 60px; } h1 { font-size: 24px; } pre { font-size: 11px; padding: 12px 14px; } table { font-size: 12px; } td, th { padding: 8px 8px; } }
+</style>
+</head>
+<body><div class="nav-bar">
+  <a href="#users" class="active">Users</a>
+  <a href="#customers">Customers</a>
+  <a href="#scans">Crop Scans</a>
+</div>
+<div class="page">
+
+<h1>MERCBEX Admin · Documentation</h1>
+<p class="subtitle">API specifications, user stories, and data models for the Users, Customers, and Crop Scans sections of the admin panel.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;">
+  <a href="https://agri-pesticides-store.vercel.app/admin" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#166534;color:#fff;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;">⚡ Live Admin Panel</a>
+  <a href="https://github.com/sudattD/mercbex-store-21072026" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#0f172a;color:#fff;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;text-decoration:none;">📦 GitHub Repo</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  USERS                                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="users">Users · Admin Dashboard</h1>
+<p class="subtitle">Per-user analytics view aggregating data from user profiles, crop scans, and orders. One row per user. Answer: <em>"Who is using our platform, what are they doing, and are they converting?"</em></p>
+
+<h3>Data Sources</h3>
+<table><tr><th>Source</th><th>localStorage Key</th><th>Provides</th></tr>
+<tr><td>User Profile</td><td><code>mercbex_user_{id}</code></td><td>Name, phone, email, addresses, created date</td></tr>
+<tr><td>Scan History</td><td><code>mercbex_crop_scans</code></td><td>Disease, crop, severity, confidence, timestamp, status</td></tr>
+<tr><td>Scan→User Map</td><td><code>mercbex_admin_scan_map</code></td><td>userId → scanId mapping</td></tr>
+<tr><td>Orders</td><td><code>order_{id}</code></td><td>Customer phone for order matching</td></tr>
+</table>
+
+<h2>Data Model</h2>
+<h3>User</h3>
+<pre>{ <span class="key">id</span>: <span class="type">string</span>, <span class="key">name</span>: <span class="type">string</span>, <span class="key">phone</span>: <span class="type">string</span>, <span class="key">email</span>: <span class="type">string</span>,
+  <span class="key">addresses</span>: <span class="type">Address[]</span>, <span class="key">createdAt</span>: <span class="type">string</span> }</pre>
+<h3>Address</h3>
+<pre>{ <span class="key">id</span>: <span class="type">string</span>, <span class="key">label</span>: <span class="type">string</span>, <span class="key">name</span>: <span class="type">string</span>, <span class="key">phone</span>: <span class="type">string</span>,
+  <span class="key">address</span>: <span class="type">string</span>, <span class="key">district</span>: <span class="type">string</span>, <span class="key">state</span>: <span class="type">string</span>, <span class="key">pin</span>: <span class="type">string</span>,
+  <span class="key">isDefault</span>: <span class="type">boolean</span> }</pre>
+<h3>ScanRecord</h3>
+<pre>{ <span class="key">id</span>: <span class="type">string</span>, <span class="key">crop</span>: <span class="type">string</span>, <span class="key">disease</span>: <span class="type">string</span>, <span class="key">severity</span>: <span class="type">string</span>,
+  <span class="key">confidence</span>: <span class="type">number</span>, <span class="key">timestamp</span>: <span class="type">string</span>, <span class="key">status</span>: <span class="type">string</span> }</pre>
+
+<h3>Users Table Columns</h3>
+<table><tr><th>Column</th><th>Source</th></tr>
+<tr><td>Name</td><td><code>user.name</code> with avatar initial</td></tr>
+<tr><td>Phone Number</td><td><code>user.phone</code></td></tr>
+<tr><td>Location</td><td><code>user.addresses</code> → district, state badges</td></tr>
+<tr><td>Crop</td><td><code>mercbex_admin_scan_map</code> → max 2 badges, +N overflow</td></tr>
+<tr><td>Language</td><td>Static "English" (future: per-user)</td></tr>
+<tr><td># Scans</td><td>Scan count by userId — hover for crop breakdown</td></tr>
+<tr><td>Customer?</td><td><span class="tag">Yes</span> if ≥1 order, else <span class="tag warn">No</span></td></tr>
+<tr><td>Orders</td><td>Count matched by phone</td></tr>
+<tr><td>Joined On</td><td><code>user.createdAt</code></td></tr>
+</table>
+
+<h2>User Stories</h2>
+<div class="story"><div class="story-head"><span class="story-id">US-001</span><span class="story-title">View all registered users</span></div><div class="story-desc">As an admin, see all signed-up users.</div><div class="story-flow"><span>→</span> Users tab → loads <code>mercbex_user_*</code> records</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-002</span><span class="story-title">Filter by location</span></div><div class="story-desc">Filter users by state.</div><div class="story-flow"><span>→</span> Location dropdown → filters by state in addresses</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-003</span><span class="story-title">Filter by crop</span></div><div class="story-desc">Filter users by crops they scanned.</div><div class="story-flow"><span>→</span> Crop dropdown → filters via <code>mercbex_admin_scan_map</code></div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-004</span><span class="story-title">Search users</span></div><div class="story-desc">Search by name or phone.</div><div class="story-flow"><span>→</span> Text input → real-time case-insensitive match</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-005</span><span class="story-title">Scan breakdown on hover</span></div><div class="story-desc">Hover # Scans to see per-crop breakdown.</div><div class="story-flow"><span>→</span> Tooltip: "3 Rice, 1 Cotton"</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-006</span><span class="story-title">Identify customers vs non-customers</span></div><div class="story-desc">See who has placed orders.</div><div class="story-flow"><span>→</span> <span class="tag">Yes</span> / <span class="tag warn">No</span> badge</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-007</span><span class="story-title">View order count</span></div><div class="story-desc">See orders per user.</div><div class="story-flow"><span>→</span> Count in Orders column</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-008</span><span class="story-title">Demo data on first visit</span></div><div class="story-desc">Empty state never shown.</div><div class="story-flow"><span>→</span> <code>seedData()</code> creates 15 users, 31 scans, 22 orders</div></div>
+
+<h2>Filters</h2>
+<table><tr><th>Filter</th><th>Type</th><th>Behavior</th></tr>
+<tr><td>Search</td><td>Text</td><td>Case-insensitive substring on name or phone</td></tr>
+<tr><td>Location</td><td>Dropdown</td><td>Unique states from addresses. AND-composed.</td></tr>
+<tr><td>Crop</td><td>Dropdown</td><td>Unique crops from scans. Uses admin_scan_map.</td></tr>
+</table>
+
+<h2>API</h2>
+<h3>GET /admin/users</h3>
+<table><tr><th>Field</th><th>Type</th></tr>
+<tr><td><code>id</code></td><td>string</td></tr>
+<tr><td><code>name</code></td><td>string</td></tr>
+<tr><td><code>phone</code></td><td>string</td></tr>
+<tr><td><code>addresses</code></td><td>Address[]</td></tr>
+<tr><td><code>createdAt</code></td><td>string</td></tr>
+<tr><td><code>scanCount</code></td><td>number</td></tr>
+<tr><td><code>scanBreakdown</code></td><td>Record&lt;crop, count&gt;</td></tr>
+<tr><td><code>orderCount</code></td><td>number</td></tr>
+<tr><td><code>isCustomer</code></td><td>boolean</td></tr>
+</table>
+
+<h3>GET /admin/users/filters</h3>
+<pre>{ <span class="str">"states"</span>: [<span class="str">"Punjab"</span>, <span class="str">"Maharashtra"</span>, …], <span class="str">"crops"</span>: [<span class="str">"Rice"</span>, <span class="str">"Cotton"</span>, …] }</pre>
+
+<h2>Implementation</h2>
+<h4>Scan→User Matching</h4>
+<pre><span class="key">const</span> sm = JSON.parse(localStorage.getItem(<span class="str">"mercbex_admin_scan_map"</span>) || <span class="str">"[]"</span>);
+<span class="key">const</span> ids = <span class="key">new</span> <span class="type">Set</span>(sm.filter((m) => m.uid === u.id).map((m) => m.sid));
+<span class="key">const</span> userScans = scans.filter((s) => ids.has(s.id));</pre>
+<h4>Order→User Matching</h4>
+<pre><span class="key">const</span> userOrders = ordersList.filter((o) => o.customer.phone === user.phone);</pre>
+<h4>Edge Cases</h4>
+<table><tr><th>Case</th><th>Handling</th></tr>
+<tr><td>Scans but no orders</td><td>Customer? = <span class="tag warn">No</span></td></tr>
+<tr><td>Orders but no scans</td><td>Crop = —</td></tr>
+<tr><td>Neither</td><td>Both show empty/No</td></tr>
+<tr><td>Multiple addresses</td><td>Separate badges</td></tr>
+<tr><td>No addresses</td><td>Location = —</td></tr>
+<tr><td>Empty localStorage</td><td>Seed data on first visit</td></tr>
+</table>
+
+<h4>Seed Data (15 users)</h4>
+<table><tr><th>User</th><th>State</th><th>Crops</th><th>Scans</th><th>Orders</th><th>Customer?</th></tr>
+<tr><td>Rajesh Kumar</td><td>Punjab</td><td>Rice, Cotton</td><td>4</td><td>2</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Anita Devi</td><td>Maharashtra</td><td>Grapes</td><td>2</td><td>1</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Suresh Patel</td><td>Gujarat</td><td>—</td><td>0</td><td>1</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Lakshmi Narayanan</td><td>Tamil Nadu</td><td>Rice, Tomato, Chili</td><td>3</td><td>0</td><td><span class="tag warn">No</span></td></tr>
+<tr><td>Mohammed Irfan</td><td>Telangana</td><td>Cotton, Sugarcane</td><td>3</td><td>1</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Kavitha Shetty</td><td>Karnataka</td><td>Rice, Cotton, Chili, Potato, Mango</td><td>5</td><td>1</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Gurpreet Singh</td><td>Punjab</td><td>—</td><td>0</td><td>0</td><td><span class="tag warn">No</span></td></tr>
+<tr><td>Priya Sharma</td><td>Madhya Pradesh</td><td>—</td><td>0</td><td>2</td><td><span class="tag">Yes</span></td></tr>
+<tr><td>Ravi Verma</td><td>Bihar</td><td>Wheat, Soybean</td><td>2</td><td>0</td><td><span class="tag warn">No</span></td></tr>
+<tr><td>Sunita Rani</td><td>Uttar Pradesh</td><td>—</td><td>0</td><td>0</td><td><span class="tag warn">No</span></td></tr>
+</table>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  CUSTOMERS                                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="customers">Customers · Admin Dashboard</h1>
+<p class="subtitle">Order-centric view grouped by customer phone number with expandable individual order timelines. Answer: <em>"Who are my repeat customers? What did they buy? How much have they spent?"</em></p>
+
+<h3>Data Sources</h3>
+<table><tr><th>Source</th><th>Key</th><th>Provides</th></tr>
+<tr><td>Orders</td><td><code>order_{id}</code></td><td>ID, items, totals, customer, payment, date, status</td></tr>
+<tr><td>User Profiles</td><td><code>mercbex_user_{id}</code></td><td>Addresses for delivery location</td></tr>
+<tr><td>Scan Map</td><td><code>mercbex_admin_scan_map</code></td><td>Crop info per user</td></tr>
+</table>
+
+<h3>Order</h3>
+<pre>{ <span class="key">id</span>: <span class="type">string</span>, <span class="key">items</span>: <span class="type">OrderItem[]</span>, <span class="key">subtotal</span>: <span class="type">number</span>,
+  <span class="key">shipping</span>: <span class="type">number</span>, <span class="key">total</span>: <span class="type">number</span>,
+  <span class="key">customer</span>: { <span class="key">name</span>: <span class="type">string</span>, <span class="key">phone</span>: <span class="type">string</span> },
+  <span class="key">payment</span>: <span class="type">string</span>, <span class="key">placedAt</span>: <span class="type">string</span>, <span class="key">status</span>: <span class="type">string</span> }</pre>
+<h3>OrderItem</h3>
+<pre>{ <span class="key">name</span>: <span class="type">string</span>, <span class="key">quantity</span>: <span class="type">number</span>, <span class="key">price</span>: <span class="type">number</span> }</pre>
+
+<h2>Views</h2>
+<h3>1. Grouped View (default)</h3>
+<table><tr><th>Column</th><th>Source</th></tr>
+<tr><td>Name</td><td><code>order.customer.name</code> + avatar</td></tr>
+<tr><td>Phone</td><td><code>order.customer.phone</code> (grouping key)</td></tr>
+<tr><td>Location</td><td>Primary address district, state</td></tr>
+<tr><td>Orders</td><td>Count by phone</td></tr>
+<tr><td>First Order</td><td>Earliest <code>placedAt</code></td></tr>
+<tr><td>Last Order</td><td>Latest <code>placedAt</code></td></tr>
+<tr><td>Total Spent</td><td>Sum of all totals</td></tr>
+<tr><td>Last Purchase</td><td>Last order product names</td></tr>
+<tr><td>Crops</td><td>Scans via admin_scan_map</td></tr>
+</table>
+
+<h3>2. Expanded Timeline View</h3>
+<table><tr><th>Column</th><th>Source</th></tr>
+<tr><td>Order ID</td><td><code>order.id</code></td></tr>
+<tr><td>Placed Date</td><td><code>order.placedAt</code></td></tr>
+<tr><td>Status</td><td><code>order.status</code> — color-coded</td></tr>
+<tr><td>Amount</td><td><code>order.total</code> — formatted ₹</td></tr>
+<tr><td>Payment</td><td><code>order.payment</code></td></tr>
+<tr><td>Invoice</td><td><code>MBX-{id}</code> — opens invoice modal</td></tr>
+<tr><td>Pesticides</td><td><code>items[].name</code> joined</td></tr>
+<tr><td>Crop</td><td>User's crops from scans</td></tr>
+<tr><td>Qty</td><td>Sum of <code>items[].quantity</code></td></tr>
+<tr><td>Delivery</td><td>Primary address</td></tr>
+</table>
+
+<h2>User Stories</h2>
+<div class="story"><div class="story-head"><span class="story-id">US-C01</span><span class="story-title">Customers grouped by phone</span></div><div class="story-desc">One row per customer with aggregate data.</div><div class="story-flow"><span>→</span> Customers tab → orders grouped by phone → count, range, total, last purchase</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C02</span><span class="story-title">Click to see order timeline</span></div><div class="story-desc">Click a customer to see all orders.</div><div class="story-flow"><span>→</span> Click row → expanded timeline → back arrow returns</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C03</span><span class="story-title">Filter by status</span></div><div class="story-desc">Filter by All, New, Processing, Shipped, Out for Delivery, Delivered, Cancelled.</div><div class="story-flow"><span>→</span> Status pills → only matching customer groups → resets expanded view</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C04</span><span class="story-title">Repeat customers</span></div><div class="story-desc">See order count + date range.</div><div class="story-flow"><span>→</span> Orders column + First/Last Order dates</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C05</span><span class="story-title">Last purchase</span></div><div class="story-desc">See most recent products bought.</div><div class="story-flow"><span>→</span> Last Purchase column → hover for full list</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C06</span><span class="story-title">Search and filter</span></div><div class="story-desc">Search by name/phone, filter by location/crop.</div><div class="story-flow"><span>→</span> AND composition at group level</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-C07</span><span class="story-title">View invoice</span></div><div class="story-desc">Click invoice number for professional invoice modal.</div><div class="story-flow"><span>→</span> Click <code>MBX-{id}</code> → modal with header, items, tax, payment → Print button</div></div>
+
+<h2>API</h2>
+<h3>GET /admin/customers/grouped</h3>
+<pre>[{ <span class="key">phone</span>: <span class="str">"9876543210"</span>, <span class="key">name</span>: <span class="str">"Rajesh Kumar"</span>,
+   <span class="key">location</span>: <span class="str">"Ludhiana, Punjab"</span>, <span class="key">orderCount</span>: <span class="type">2</span>,
+   <span class="key">firstOrder</span>: <span class="str">"2026-07-19"</span>, <span class="key">lastOrder</span>: <span class="str">"2026-07-20"</span>,
+   <span class="key">totalSpent</span>: <span class="type">3396</span>,
+   <span class="key">lastPurchase</span>: [<span class="str">"Imidacloprid 17.1% SL"</span>],
+   <span class="key">crops</span>: [<span class="str">"Rice (Paddy)"</span>, <span class="str">"Cotton"</span>] }]</pre>
+<h3>GET /admin/customers/:phone/orders</h3>
+<pre>[{ <span class="key">id</span>: <span class="str">"ORD001"</span>, <span class="key">status</span>: <span class="str">"placed"</span>, <span class="key">total</span>: <span class="type">2497</span>,
+   <span class="key">payment</span>: <span class="str">"COD"</span>, <span class="key">placedAt</span>: <span class="str">"2026-07-20T06:15:00Z"</span>,
+   <span class="key">invoice</span>: <span class="str">"MBX-001"</span>, <span class="key">totalQty</span>: <span class="type">3</span>,
+   <span class="key">delivery</span>: <span class="str">"Ludhiana, Punjab"</span> }]</pre>
+
+<h2>Implementation</h2>
+<h4>Grouping</h4>
+<pre><span class="key">const</span> groups = <span class="key">new</span> <span class="type">Map</span>();
+ordersList.forEach((o) => {
+  <span class="key">if</span> (!groups.has(o.customer.phone)) groups.set(o.customer.phone, []);
+  groups.get(o.customer.phone)!.push(o);
+});</pre>
+<h4>Expanded View</h4>
+<p><code>expandedCustomer</code> state = phone or null. Filter change resets to null.</p>
+<h4>Edge Cases</h4>
+<table><tr><th>Case</th><th>Handling</th></tr>
+<tr><td>Single order</td><td>First/Last show same date</td></tr>
+<tr><td>Cancelled</td><td>Red badge + filter tab</td></tr>
+<tr><td>No user profile</td><td>Location/Crops = —</td></tr>
+</table>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  CROP SCANS                                                                -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="scans">Crop Scans · Admin Dashboard</h1>
+<p class="subtitle">Tracking the AI scan lifecycle — new scan → incomplete → action needed → in cart — with user attribution.</p>
+
+<h3>Scan Lifecycle</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0;">
+  <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;padding:16px;text-align:center;">
+    <div style="font-size:24px;font-weight:700;color:#e65100;">1</div>
+    <div style="font-size:13px;font-weight:600;color:#e65100;">Incomplete</div>
+    <div style="font-size:11px;color:#bf360c;">User confirmed ≥1 disease but left before viewing treatment.</div>
+  </div>
+  <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:16px;text-align:center;">
+    <div style="font-size:24px;font-weight:700;color:#f57f17;">2</div>
+    <div style="font-size:13px;font-weight:600;color:#f57f17;">Action Needed</div>
+    <div style="font-size:11px;color:#e65100;">User saw treatment but didn't add to cart.</div>
+  </div>
+  <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:16px;text-align:center;">
+    <div style="font-size:24px;font-weight:700;color:#2e7d32;">3</div>
+    <div style="font-size:13px;font-weight:600;color:#2e7d32;">In Cart</div>
+    <div style="font-size:11px;color:#1b5e20;">User added ≥1 product. Highest engagement.</div>
+  </div>
+</div>
+
+<h3>Status Mapping</h3>
+<table><tr><th>Event</th><th>Status</th><th>Category</th></tr>
+<tr><td>Results shown</td><td><code>new_scan</code></td><td>Initial</td></tr>
+<tr><td>"Save &amp; See Treatment"</td><td><code>action_needed</code></td><td>Action Needed</td></tr>
+<tr><td>Add to Cart</td><td><code>in_cart</code></td><td>In Cart</td></tr>
+<tr><td>Rescan without saving</td><td><code>incomplete</code></td><td>Incomplete</td></tr>
+<tr><td>All rejected / no confirm</td><td>Not saved</td><td>—</td></tr>
+</table>
+
+<h3>Scans Table Columns</h3>
+<table><tr><th>Column</th><th>Source</th></tr>
+<tr><td>User</td><td><code>mercbex_admin_scan_map</code> → name, phone, avatar</td></tr>
+<tr><td>Crop</td><td><code>scan.crop</code></td></tr>
+<tr><td>Disease</td><td><code>scan.disease</code> — truncated, hover for full</td></tr>
+<tr><td>Severity</td><td>Color-coded badge</td></tr>
+<tr><td>Confidence</td><td>Percentage</td></tr>
+<tr><td>Products</td><td>From user's orders (In Cart only) — first name, hover for full list</td></tr>
+<tr><td>Status</td><td>Color-coded badge. In Cart hover shows products.</td></tr>
+<tr><td>Date</td><td>Formatted timestamp</td></tr>
+</table>
+
+<h2>User Stories</h2>
+<div class="story"><div class="story-head"><span class="story-id">US-S01</span><span class="story-title">Scan funnel summary</span></div><div class="story-desc">See scan counts by stage at a glance.</div><div class="story-flow"><span>→</span> Four cards: Incomplete (orange), Action Needed (amber), In Cart (green), Total (blue)</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-S02</span><span class="story-title">Filter by status</span></div><div class="story-desc">Filter by funnel stage.</div><div class="story-flow"><span>→</span> Status pills → table updates</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-S03</span><span class="story-title">See user per scan</span></div><div class="story-desc">Know who performed each scan.</div><div class="story-flow"><span>→</span> User column with avatar, name, phone</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-S04</span><span class="story-title">Products added to cart</span></div><div class="story-desc">See what was added after scanning.</div><div class="story-flow"><span>→</span> In Cart scans show product name → hover for full list</div></div>
+<div class="story"><div class="story-head"><span class="story-id">US-S05</span><span class="story-title">Track scan-to-purchase funnel</span></div><div class="story-desc">Identify drop-off points.</div><div class="story-flow"><span>→</span> Cards show counts → gap = drop-off</div></div>
+
+<h2>API</h2>
+<h3>GET /admin/scans</h3>
+<pre>{
+  <span class="key">summary</span>: { <span class="key">incomplete</span>: <span class="type">12</span>, <span class="key">actionNeeded</span>: <span class="type">8</span>, <span class="key">inCart</span>: <span class="type">11</span>, <span class="key">total</span>: <span class="type">31</span> },
+  <span class="key">scans</span>: [{ <span class="key">id</span>: <span class="str">"s1"</span>, <span class="key">user</span>: { <span class="key">name</span>: <span class="str">"Rajesh Kumar"</span>, <span class="key">phone</span>: <span class="str">"9876543210"</span> },
+             <span class="key">crop</span>: <span class="str">"Rice (Paddy)"</span>, <span class="key">disease</span>: <span class="str">"Brown Plant Hopper"</span>,
+             <span class="key">severity</span>: <span class="str">"critical"</span>, <span class="key">confidence</span>: <span class="type">94</span>,
+             <span class="key">status</span>: <span class="str">"action_needed"</span> }]
+}</pre>
+
+<h2>Implementation</h2>
+<h4>Scan Map Lookup</h4>
+<pre><span class="key">const</span> sm = JSON.parse(localStorage.getItem(<span class="str">"mercbex_admin_scan_map"</span>) || <span class="str">"[]"</span>);
+<span class="key">const</span> match = sm.find((m) =&gt; m.sid === scan.id);
+<span class="key">const</span> user = match ? users.find((u) =&gt; u.id === match.uid) : <span class="key">null</span>;</pre>
+<h4>Products Column (In Cart)</h4>
+<pre><span class="key">const</span> products = [...<span class="key">new</span> <span class="type">Set</span>(
+  ordersList.filter((o) =&gt; o.customer.phone === user?.phone)
+    .flatMap((o) =&gt; o.items.map((i) =&gt; i.name))
+)];</pre>
+<h4>Edge Cases</h4>
+<table><tr><th>Case</th><th>Handling</th></tr>
+<tr><td>No linked user</td><td>User = —</td></tr>
+<tr><td>In Cart, no product data</td><td>Products = —</td></tr>
+<tr><td>No matches for filter</td><td>"No scans found"</td></tr>
+</table>
+
+</div>
+</body>
+</html>
