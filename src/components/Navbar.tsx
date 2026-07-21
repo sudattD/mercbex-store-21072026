@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -13,6 +14,23 @@ export default function Navbar() {
   const { totalItems, setIsCartOpen } = useCart();
   const { lang, setLang, t } = useLanguage();
   const { user } = useAuth();
+  const pathname = usePathname();
+
+  const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const linkCls = (href: string) =>
+    `flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium transition text-sm ${
+      isActive(href) ? "bg-brand-100 text-brand-800" : "text-gray-600 hover:text-brand-700 hover:bg-brand-50"
+    }`;
+  const scanCls = isActive("/scan")
+    ? "flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-600 text-white font-semibold transition text-sm"
+    : "flex items-center gap-1.5 px-3 py-2 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 font-semibold transition text-sm";
+  const mobileCls = (href: string) =>
+    `flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition ${
+      isActive(href) ? "bg-brand-100 text-brand-800" : "text-gray-700 hover:bg-brand-50 hover:text-brand-700"
+    }`;
+  const mobileScanCls = isActive("/scan")
+    ? "flex items-center gap-3 px-4 py-2.5 bg-green-600 text-white rounded-lg font-semibold transition"
+    : "flex items-center gap-3 px-4 py-2.5 bg-green-50 text-green-700 rounded-lg font-semibold transition";
   const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,19 +83,26 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden lg:flex items-center gap-1">
-            <Link href="/" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-brand-700 hover:bg-brand-50 font-medium transition text-sm">
+            <Link href="/" className={linkCls("/")}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
               {t("nav.home")}
             </Link>
-            <Link href="/products" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-brand-700 hover:bg-brand-50 font-medium transition text-sm">
+            <Link href="/scan" className={scanCls}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+              </svg>
+              AI Scanner
+            </Link>
+            <Link href="/products" className={linkCls("/products")}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
               {t("nav.products")}
             </Link>
-            <Link href="/about" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-brand-700 hover:bg-brand-50 font-medium transition text-sm">
+            <Link href="/about" className={linkCls("/about")}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               {t("nav.about")}
             </Link>
-            <Link href="/contact" className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-brand-700 hover:bg-brand-50 font-medium transition text-sm">
+            <Link href="/contact" className={linkCls("/contact")}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               {t("nav.contact")}
             </Link>
@@ -167,19 +192,26 @@ export default function Navbar() {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-gray-100 py-4 space-y-1">
-            <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">
+            <Link href="/" onClick={() => setMobileOpen(false)} className={mobileCls("/")}>
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg>
               {t("nav.home")}
             </Link>
-            <Link href="/products" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">
+            <Link href="/scan" onClick={() => setMobileOpen(false)} className={mobileScanCls}>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+              </svg>
+              AI Scanner
+            </Link>
+            <Link href="/products" onClick={() => setMobileOpen(false)} className={mobileCls("/products")}>
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
               {t("nav.products")}
             </Link>
-            <Link href="/about" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">
+            <Link href="/about" onClick={() => setMobileOpen(false)} className={mobileCls("/about")}>
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               {t("nav.about")}
             </Link>
-            <Link href="/contact" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-brand-50 hover:text-brand-700 rounded-lg font-medium transition">
+            <Link href="/contact" onClick={() => setMobileOpen(false)} className={mobileCls("/contact")}>
               <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               {t("nav.contact")}
             </Link>

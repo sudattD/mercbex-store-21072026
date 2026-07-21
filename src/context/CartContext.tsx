@@ -3,15 +3,24 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Product } from "@/data/products";
 
+export interface ScanContext {
+  crop: string;
+  cropIcon: string;
+  disease: string;
+  severity: string;
+  scannedAt: string;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
   selectedSize: string;
+  scanContext?: ScanContext;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, size: string, quantity?: number) => void;
+  addToCart: (product: Product, size: string, quantity?: number, scanContext?: ScanContext) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -27,7 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const addToCart = useCallback((product: Product, size: string, quantity = 1) => {
+  const addToCart = useCallback((product: Product, size: string, quantity = 1, scanContext?: ScanContext) => {
     setItems((prev) => {
       const existing = prev.find(
         (item) => item.product.id === product.id && item.selectedSize === size
@@ -35,11 +44,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existing) {
         return prev.map((item) =>
           item.product.id === product.id && item.selectedSize === size
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + quantity, scanContext: scanContext || item.scanContext }
             : item
         );
       }
-      return [...prev, { product, quantity, selectedSize: size }];
+      return [...prev, { product, quantity, selectedSize: size, scanContext }];
     });
     setIsCartOpen(true);
   }, []);

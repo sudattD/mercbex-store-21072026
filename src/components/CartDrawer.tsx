@@ -1,12 +1,75 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
-import { useCart } from "@/context/CartContext";
+import { useCart, type CartItem } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+
+function timeAgo(iso: string) {
+  const diff = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (diff < 1) return "just now";
+  if (diff < 60) return `${diff}m ago`;
+  if (diff < 1440) return `${Math.round(diff / 60)}h ago`;
+  return `${Math.round(diff / 1440)}d ago`;
+}
+
+function CartItemRow({ item, updateQuantity, removeFromCart }: {
+  item: CartItem;
+  updateQuantity: (id: string, qty: number) => void;
+  removeFromCart: (id: string) => void;
+}) {
+  return (
+    <div className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+      <div className="w-14 h-14 bg-brand-900 rounded-lg flex flex-col items-center justify-center shrink-0">
+        <span className="text-[6px] font-extrabold text-white tracking-wider">MERCBEX</span>
+        <span className="text-[5px] text-brand-200 text-center mt-0.5 px-1 line-clamp-1">{item.product.formulation}</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-sm text-gray-900 truncate">{item.product.name}</h3>
+        <p className="text-[11px] text-gray-400 mt-0.5">{item.selectedSize}</p>
+        {item.scanContext && (
+          <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-green-700">
+            <span>For {item.scanContext.disease}</span>
+            <span className="text-green-500/50">· {timeAgo(item.scanContext.scannedAt)}</span>
+          </div>
+        )}
+        <p className="text-brand-700 font-bold text-sm mt-1">₹{item.product.price.toLocaleString()}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-7 h-7 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition text-sm">-</button>
+          <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+          <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-7 h-7 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition text-sm">+</button>
+          <button onClick={() => removeFromCart(item.product.id)} className="ml-auto text-red-400 hover:text-red-600 transition">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CartDrawer() {
   const { items, removeFromCart, updateQuantity, totalPrice, isCartOpen, setIsCartOpen } = useCart();
   const { t } = useLanguage();
+
+  // Group items: scan items grouped by crop, rest in "other"
+  const { cropGroups, otherItems } = useMemo(() => {
+    const groups: Record<string, { crop: string; cropIcon: string; items: CartItem[] }> = {};
+    const other: CartItem[] = [];
+
+    items.forEach((item) => {
+      if (item.scanContext) {
+        const key = item.scanContext.crop;
+        if (!groups[key]) {
+          groups[key] = { crop: item.scanContext.crop, cropIcon: item.scanContext.cropIcon, items: [] };
+        }
+        groups[key].items.push(item);
+      } else {
+        other.push(item);
+      }
+    });
+
+    return { cropGroups: Object.values(groups), otherItems: other };
+  }, [items]);
 
   if (!isCartOpen) return null;
 
@@ -23,7 +86,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {items.length === 0 ? (
             <div className="text-center py-16">
               <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,27 +96,40 @@ export default function CartDrawer() {
               <p className="text-sm text-gray-400 mt-1">{t("cart.emptyDesc")}</p>
             </div>
           ) : (
-            items.map((item) => (
-              <div key={item.product.id} className="flex gap-4 p-3 bg-gray-50 rounded-xl">
-                <div className="w-16 h-16 bg-brand-900 rounded-lg flex flex-col items-center justify-center shrink-0">
-                  <span className="text-[6px] font-extrabold text-white tracking-wider">MERCBEX</span>
-                  <span className="text-[5px] text-brand-200 text-center mt-0.5 px-1 line-clamp-1">{item.product.formulation}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm text-gray-900 truncate">{item.product.name}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">{item.selectedSize}</p>
-                  <p className="text-brand-700 font-bold mt-1">₹{item.product.price.toLocaleString()}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-7 h-7 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition text-sm">-</button>
-                    <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-7 h-7 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition text-sm">+</button>
-                    <button onClick={() => removeFromCart(item.product.id)} className="ml-auto text-red-400 hover:text-red-600 transition">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
+            <>
+              {/* Crop-grouped sections */}
+              {cropGroups.map((group) => (
+                <div key={group.crop}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg leading-none">{group.cropIcon}</span>
+                    <h3 className="text-sm font-bold text-gray-900">{group.crop}</h3>
+                    <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">{group.items.length} {group.items.length === 1 ? "medicine" : "medicines"}</span>
+                  </div>
+                  <div className="space-y-3">
+                    {group.items.map((item) => (
+                      <CartItemRow key={item.product.id} item={item} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />
+                    ))}
                   </div>
                 </div>
-              </div>
-            ))
+              ))}
+
+              {/* Other items (not from scan) */}
+              {otherItems.length > 0 && (
+                <div>
+                  {cropGroups.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      <h3 className="text-sm font-bold text-gray-900">Other Items</h3>
+                    </div>
+                  )}
+                  <div className="space-y-3">
+                    {otherItems.map((item) => (
+                      <CartItemRow key={item.product.id} item={item} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 

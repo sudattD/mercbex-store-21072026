@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { commonProblems, products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import CategoryIcon from "@/components/CategoryIcon";
 
 const severityColors = {
   low: "bg-green-100 text-green-800",
@@ -42,7 +43,7 @@ export default function ProblemDetailPage() {
             <span className="text-white">Crop Problems</span>
           </div>
           <div className="flex items-start gap-4">
-            <span className="text-5xl">{problem.icon}</span>
+            <span className="text-green-400"><CategoryIcon name={problem.icon} className="w-12 h-12" /></span>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white">{problem.problem}</h1>
               <p className="text-brand-200 mt-2 leading-relaxed max-w-2xl">{problem.description}</p>

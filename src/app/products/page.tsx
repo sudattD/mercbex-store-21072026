@@ -7,6 +7,7 @@ import { analyzeCropImage, AnalysisResult } from "@/data/cropAnalysis";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
+import CategoryIcon from "@/components/CategoryIcon";
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -293,7 +294,7 @@ function ProductsContent() {
                       </span>
                       <div>
                         <p className="font-bold text-gray-900 flex items-center gap-1.5">
-                          <span>{issue.icon}</span> {issue.name}
+                          <CategoryIcon name={issue.icon} className="w-4 h-4" /> {issue.name}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">{issue.description}</p>
                       </div>
@@ -403,7 +404,7 @@ function ProductsContent() {
                       onClick={() => setSelectedCategory(cat.slug)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition flex items-center gap-2 ${selectedCategory === cat.slug ? "bg-brand-50 text-brand-700 font-semibold" : "text-gray-600 hover:bg-gray-50"}`}
                     >
-                      <span className="text-base">{cat.icon}</span>
+                      <CategoryIcon name={cat.icon} className="w-4 h-4" />
                       {cat.name} ({categoryCount(cat.slug)})
                     </button>
                   ))}

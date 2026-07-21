@@ -21,11 +21,11 @@ export interface Product {
 }
 
 export const categories = [
-  { name: "Insecticide", slug: "insecticide", icon: "🐛", description: "Protect crops from harmful insects" },
-  { name: "Fungicide", slug: "fungicide", icon: "🛡️", description: "Fight fungal diseases effectively" },
-  { name: "Herbicide", slug: "herbicide", icon: "🌿", description: "Eliminate unwanted weeds" },
-  { name: "Rodenticide", slug: "rodenticide", icon: "🐀", description: "Control rodent infestations" },
-  { name: "Plant Growth Regulator", slug: "pgr", icon: "📈", description: "Boost crop growth and yield" },
+  { name: "Insecticide", slug: "insecticide", icon: "Bug", description: "Protect crops from harmful insects" },
+  { name: "Fungicide", slug: "fungicide", icon: "Shield", description: "Fight fungal diseases effectively" },
+  { name: "Herbicide", slug: "herbicide", icon: "Leaf", description: "Eliminate unwanted weeds" },
+  { name: "Rodenticide", slug: "rodenticide", icon: "Rat", description: "Control rodent infestations" },
+  { name: "Plant Growth Regulator", slug: "pgr", icon: "TrendingUp", description: "Boost crop growth and yield" },
 ];
 
 // Common pest/problem lookup for the worried farmer persona
@@ -78,7 +78,7 @@ export const commonProblems: CropProblem[] = [
     id: "bollworm-caterpillar",
     problem: "Bollworm / Caterpillar",
     solution: "Chlorfenapyr 10% SC, Bifenthrin 8% + Clothianidin 10% SC",
-    icon: "🐛",
+    icon: "Bug",
     description: "Larvae of moths that bore into fruiting bodies (bolls, pods, fruits). American bollworm (Helicoverpa armigera) is one of the most destructive pests, causing massive yield losses in cotton and pulses.",
     symptoms: [
       "Round entry holes in bolls, fruits, or pods",
@@ -190,7 +190,7 @@ export const commonProblems: CropProblem[] = [
     id: "broadleaf-weeds",
     problem: "Broadleaf Weeds",
     solution: "Pendimethalin 38.4% + Pyrazosulfuron Ethyl 0.85% ZC, Halosulfuron methyl 12% + Metribuzin 55% WG",
-    icon: "🌿",
+    icon: "Leaf",
     description: "Broad-leaved weeds compete with crops for water, nutrients, and sunlight. Common species include Parthenium, Amaranthus, Chenopodium, and Eclipta. They can reduce yield by 30-50% if not managed early.",
     symptoms: [
       "Wide-leaved plants growing between crop rows",
@@ -1014,7 +1014,7 @@ export const crops: CropType[] = [
     id: "rice",
     name: "Rice (Paddy)",
     icon: "🌾",
-    image: "https://images.unsplash.com/photo-1536054337653-eca34bc11e5c?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1594771804886-a933bb2d609b?auto=format&fit=crop&w=400&q=80",
     description: "Complete protection for paddy from BPH, stem borer & blast",
     commonIssues: [
       {
@@ -1056,7 +1056,7 @@ export const crops: CropType[] = [
     id: "cotton",
     name: "Cotton",
     icon: "🏵️",
-    image: "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=400&q=80",
     description: "Guard against bollworm, whitefly & jassids",
     commonIssues: [
       {
@@ -1097,7 +1097,7 @@ export const crops: CropType[] = [
   {
     id: "wheat",
     name: "Wheat",
-    icon: "🌿",
+    icon: "Leaf",
     image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80",
     description: "Protect from termites, rust & weed competition",
     commonIssues: [
@@ -1266,7 +1266,7 @@ export const crops: CropType[] = [
     id: "potato",
     name: "Potato",
     icon: "🥔",
-    image: "https://images.unsplash.com/photo-1518977676601-b28d0b5fa0e4?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1508313880080-c4bef0730395?auto=format&fit=crop&w=400&q=80",
     description: "Prevent late blight, early blight & cutworm",
     commonIssues: [
       {
@@ -1350,7 +1350,7 @@ export const crops: CropType[] = [
     id: "soybean",
     name: "Soybean",
     icon: "🫘",
-    image: "https://images.unsplash.com/photo-1599595568481-3f89e2138dd7?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?auto=format&fit=crop&w=400&q=80",
     description: "Manage pod borer, rust & weed infestation",
     commonIssues: [
       {
@@ -1429,5 +1429,41 @@ export const crops: CropType[] = [
       },
     ],
     matchingProductIds: ["8", "16", "18", "20"],
+  },
+  {
+    id: "onion",
+    name: "Onion",
+    icon: "🧅",
+    image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80",
+    description: "Protect onion crops from thrips and purple blotch",
+    commonIssues: [],
+    matchingProductIds: ["8", "17"],
+  },
+  {
+    id: "maize",
+    name: "Maize (Corn)",
+    icon: "🌽",
+    image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=400&q=80",
+    description: "Shield maize from fall armyworm and stem borer",
+    commonIssues: [],
+    matchingProductIds: ["5", "7"],
+  },
+  {
+    id: "groundnut",
+    name: "Groundnut",
+    icon: "🥜",
+    image: "https://images.unsplash.com/photo-1567892737950-30c4db37cd89?auto=format&fit=crop&w=400&q=80",
+    description: "Control leaf spot and white grub in groundnut",
+    commonIssues: [],
+    matchingProductIds: ["16", "1"],
+  },
+  {
+    id: "banana",
+    name: "Banana",
+    icon: "🍌",
+    image: "https://images.unsplash.com/photo-1603833665858-e61d17a86224?auto=format&fit=crop&w=400&q=80",
+    description: "Manage banana bunchy top virus and sigatoka",
+    commonIssues: [],
+    matchingProductIds: ["8", "17", "18"],
   },
 ];

@@ -28,7 +28,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "high",
     description: "Sucking pests detected on leaf undersides. Yellowing and curling of leaves visible. Immediate treatment recommended.",
     matchingProductIds: ["2", "4", "8", "10"], // Clothianidin, Thiacloprid, Imidacloprid, Flupyrimin
-    icon: "🐛",
+    icon: "Bug",
   },
   {
     id: "bollworm-damage",
@@ -37,7 +37,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "critical",
     description: "Boring damage and frass visible on fruits/bolls. Larvae feeding actively. Urgent intervention needed to prevent yield loss.",
     matchingProductIds: ["5", "7", "4"], // Bifenthrin+Clothianidin, Chlorfenapyr, Thiacloprid
-    icon: "🐛",
+    icon: "Bug",
   },
   {
     id: "fungal-leaf-spot",
@@ -55,7 +55,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "critical",
     description: "White/grey fuzzy growth on leaf undersides with water-soaked lesions on top. Spreads rapidly in humid conditions.",
     matchingProductIds: ["17", "18", "19"], // Copper Hydroxide, Copper Oxychloride, Mancozeb+Azoxystrobin
-    icon: "🛡️",
+    icon: "Shield",
   },
   {
     id: "powdery-mildew",
@@ -64,7 +64,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "medium",
     description: "White powdery coating on leaves and stems. Reduces photosynthesis and weakens the plant over time.",
     matchingProductIds: ["15", "16"], // Kasugamycin+Thifluzamide, Azoxystrobin+Tebuconazole
-    icon: "🛡️",
+    icon: "Shield",
   },
   {
     id: "termite-damage",
@@ -82,7 +82,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "medium",
     description: "Heavy weed growth competing with crop for nutrients, water, and sunlight. Pre/post-emergence treatment advised.",
     matchingProductIds: ["21", "22", "23", "24", "25"], // Herbicides
-    icon: "🌿",
+    icon: "Leaf",
   },
   {
     id: "mite-damage",
@@ -100,7 +100,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "low",
     description: "Yellowing, stunting, or abnormal growth patterns suggest nutrient issues. Consider plant growth regulators alongside fertilization.",
     matchingProductIds: ["29", "30"], // PGRs
-    icon: "📈",
+    icon: "TrendingUp",
   },
   {
     id: "rodent-damage",
@@ -109,7 +109,7 @@ const issueDatabase: DetectedIssue[] = [
     severity: "high",
     description: "Gnaw marks on stems, roots, or stored produce. Burrow holes visible near crop rows.",
     matchingProductIds: ["27", "28"], // Rodenticides
-    icon: "🐀",
+    icon: "Rat",
   },
 ];
 
