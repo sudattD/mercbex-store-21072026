@@ -173,6 +173,7 @@ export default function AdminPage() {
   const [customerSearch, setCustomerSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("all");
   const [scanFilter, setScanFilter] = useState("all");
+  const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
 
   useEffect(() => {
     seedData();
@@ -599,83 +600,135 @@ export default function AdminPage() {
                 </select>
                 <span className="text-xs text-gray-400 self-center">{ordersList.length} orders</span>
               </div>
-              {/* Status filter tabs */}
               <div className="flex gap-2 flex-wrap">
                 {[
-                  { key: "all", label: "All", color: "bg-gray-100 text-gray-700" },
-                  { key: "placed", label: "New", color: "bg-blue-100 text-blue-700" },
-                  { key: "processing", label: "Processing", color: "bg-amber-100 text-amber-700" },
-                  { key: "shipped", label: "Shipped", color: "bg-purple-100 text-purple-700" },
-                  { key: "out_for_delivery", label: "Out for Delivery", color: "bg-cyan-100 text-cyan-700" },
-                  { key: "delivered", label: "Delivered", color: "bg-green-100 text-green-700" },
+                  { key: "all", label: "All" },
+                  { key: "placed", label: "New" },
+                  { key: "processing", label: "Processing" },
+                  { key: "shipped", label: "Shipped" },
+                  { key: "out_for_delivery", label: "Out for Delivery" },
+                  { key: "delivered", label: "Delivered" },
+                  { key: "cancelled", label: "Cancelled" },
                 ].map((s) => (
-                  <button key={s.key} onClick={() => setOrderStatusFilter(s.key)}
+                  <button key={s.key} onClick={() => { setOrderStatusFilter(s.key); setExpandedCustomer(null); }}
                     className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition ${orderStatusFilter === s.key ? "bg-brand-800 text-white border-brand-800" : "bg-white text-gray-600 border-gray-200 hover:border-brand-300"}`}>
                     {s.label}
                   </button>
                 ))}
               </div>
               <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="bg-gray-50 text-left">
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Name</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Phone Number</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Location</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Order ID</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Placed Date</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Status</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Amount</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Payment</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Invoice</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Pesticides</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Crop</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Qty</th>
-                      <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Delivery</th>
-                    </tr></thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {(() => {
-                        const filtered = ordersList.filter((o) => {
-                          if (orderStatusFilter !== "all" && o.status !== orderStatusFilter) return false;
-                          if (customerSearch.trim()) { const q = customerSearch.toLowerCase(); if (!o.customer.name?.toLowerCase().includes(q) && !o.customer.phone?.includes(q)) return false; }
-                          if (locationFilter !== "all") { const u = users.find((u2) => u2.phone === o.customer.phone); if (!u?.addresses.some((a) => a.state === locationFilter)) return false; }
-                          if (cropFilter !== "all") { const u = users.find((u2) => u2.phone === o.customer.phone); if (u) { const sm = JSON.parse(localStorage.getItem("mercbex_admin_scan_map") || "[]") as { sid: string; uid: string; crop: string }[]; const ids = new Set(sm.filter((m) => m.uid === u.id).map((m) => m.sid)); const us = scans.filter((s) => ids.has(s.id)); if (!us.some((s) => s.crop === cropFilter)) return false; } else return false; }
-                          return true;
-                        });
-                        return filtered.map((o) => {
-                          const user = users.find((u) => u.phone === o.customer.phone);
-                          const locationShort = user?.addresses[0] ? `${user.addresses[0].district}, ${user.addresses[0].state}` : o.customer.address || "—";
-                          const pesticides = o.items.map((i) => i.name).join(", ");
-                          const sm = JSON.parse(localStorage.getItem("mercbex_admin_scan_map") || "[]") as { sid: string; uid: string; crop: string }[];
-                          const userCrops = [...new Set(sm.filter((m) => m.uid === user?.id).map((m) => m.crop))].join(", ") || "—";
-                          const totalQty = o.items.reduce((s, i) => s + i.quantity, 0);
-                          const invoice = `MBX-${o.id.replace("ORD", "")}`;
-                          const locationFull = user?.addresses.map((a) => `${a.address}, ${a.district}, ${a.state} - ${a.pin}`).join(" | ") || "—";
-                          return (
-                            <tr key={o.id} className="hover:bg-gray-50 transition">
-                              <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{o.customer.name}</td>
-                              <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{o.customer.phone}</td>
-                              <td className="px-4 py-3 max-w-[140px]"><span className="text-xs text-gray-600 truncate block" title={locationFull}>{locationShort}</span></td>
-                              <td className="px-4 py-3 font-mono text-xs text-gray-500 whitespace-nowrap">{o.id}</td>
-                              <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{dt(o.placedAt)}</td>
-                              <td className="px-4 py-3 whitespace-nowrap">{orderStatusTag(o.status)}</td>
-                              <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">{fmt(o.total)}</td>
-                              <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{o.payment}</td>
-                              <td className="px-4 py-3 whitespace-nowrap">
-                                <button onClick={() => setInvoiceOrder(o)} className="font-mono text-[10px] text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">{invoice}</button>
-                              </td>
-                              <td className="px-4 py-3 max-w-[200px]"><span className="text-xs text-gray-700 truncate block" title={pesticides}>{pesticides}</span></td>
-                              <td className="px-4 py-3 max-w-[120px]"><span className="text-xs text-gray-700 truncate block" title={userCrops}>{userCrops}</span></td>
-                              <td className="px-4 py-3 text-right text-sm font-semibold">{totalQty}</td>
-                              <td className="px-4 py-3 max-w-[160px]"><span className="text-xs text-gray-500 truncate block" title={locationFull}>{locationShort}</span></td>
-                            </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
-                {ordersList.length === 0 && <div className="text-center py-12 text-gray-400 text-sm">No customers found</div>}
+                {expandedCustomer === null ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead><tr className="bg-gray-50 text-left">
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Name</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Phone</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Location</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Orders</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">First Order</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Last Order</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Total Spent</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Last Purchase</th>
+                        <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Crops</th>
+                      </tr></thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {(() => {
+                          const groups = new Map<string, (typeof ordersList[0])[]>();
+                          let filtered = ordersList;
+                          if (orderStatusFilter !== "all") filtered = filtered.filter((o) => o.status === orderStatusFilter);
+                          filtered.forEach((o) => { const p = o.customer.phone; if (!groups.has(p)) groups.set(p, []); groups.get(p)!.push(o); });
+                          const smAll = JSON.parse(localStorage.getItem("mercbex_admin_scan_map") || "[]") as { sid: string; uid: string; crop: string }[];
+                          const grouped = Array.from(groups.entries()).filter(([phone]) => {
+                            if (customerSearch.trim()) { const o = groups.get(phone)![0]; const q = customerSearch.toLowerCase(); if (!o.customer.name?.toLowerCase().includes(q) && !o.customer.phone?.includes(q)) return false; }
+                            if (locationFilter !== "all") { const u = users.find((u2) => u2.phone === phone); if (!u?.addresses.some((a) => a.state === locationFilter)) return false; }
+                            if (cropFilter !== "all") { const u = users.find((u2) => u2.phone === phone); if (u) { const ids = new Set(smAll.filter((m) => m.uid === u.id).map((m) => m.sid)); const us = scans.filter((s) => ids.has(s.id)); if (!us.some((s) => s.crop === cropFilter)) return false; } else return false; }
+                            return true;
+                          }).sort((a, b) => new Date(b[1][0].placedAt).getTime() - new Date(a[1][0].placedAt).getTime());
+                          return grouped.map(([phone, customerOrders]) => {
+                            const c = customerOrders[0].customer;
+                            const user = users.find((u) => u.phone === phone);
+                            const locShort = user?.addresses[0] ? `${user.addresses[0].district}, ${user.addresses[0].state}` : "—";
+                            const locFull = user?.addresses.map((a) => `${a.address}, ${a.district}, ${a.state} - ${a.pin}`).join(" | ") || "—";
+                            const sorted = [...customerOrders].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime());
+                            const firstOrder = sorted[sorted.length - 1];
+                            const lastOrder = sorted[0];
+                            const totalSpent = sorted.reduce((s, o) => s + o.total, 0);
+                            const lastPurchase = lastOrder.items.map((i) => i.name).join(", ");
+                            const crops = [...new Set(smAll.filter((m) => m.uid === user?.id).map((m) => m.crop))].join(", ") || "—";
+                            return (
+                              <tr key={phone} onClick={() => setExpandedCustomer(phone)} className="hover:bg-gray-50 transition cursor-pointer">
+                                <td className="px-4 py-3"><div className="flex items-center gap-2"><div className="w-7 h-7 bg-brand-100 rounded-full flex items-center justify-center text-[10px] font-bold text-brand-700">{c.name?.charAt(0)}</div><p className="font-medium text-gray-900 text-sm">{c.name}</p></div></td>
+                                <td className="px-4 py-3 text-gray-700 whitespace-nowrap text-sm">{phone}</td>
+                                <td className="px-4 py-3 max-w-[120px]"><span className="text-xs text-gray-600 truncate block" title={locFull}>{locShort}</span></td>
+                                <td className="px-4 py-3 text-right"><span className="text-sm font-bold text-gray-900">{sorted.length}</span></td>
+                                <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{dt(firstOrder.placedAt)}</td>
+                                <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{sorted.length > 1 ? dt(lastOrder.placedAt) : "—"}</td>
+                                <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">{fmt(totalSpent)}</td>
+                                <td className="px-4 py-3 max-w-[160px]"><span className="text-xs text-gray-700 truncate block" title={lastPurchase}>{lastPurchase.substring(0, 40)}{lastPurchase.length > 40 ? "..." : ""}</span></td>
+                                <td className="px-4 py-3 max-w-[100px]"><span className="text-xs text-gray-600 truncate block" title={crops}>{crops}</span></td>
+                              </tr>
+                            );
+                          });
+                        })()}
+                      </tbody>
+                    </table>
+                    {(() => { let f = ordersList; if (orderStatusFilter !== "all") f = f.filter((o) => o.status === orderStatusFilter); return f.length; })() === 0 && <div className="text-center py-12 text-gray-400 text-sm">No customers found</div>}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+                      <button onClick={() => setExpandedCustomer(null)} className="text-gray-400 hover:text-gray-600">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" d="M15 19l-7-7 7-7" /></svg>
+                      </button>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm">{ordersList.find((o) => o.customer.phone === expandedCustomer)?.customer.name}</p>
+                        <p className="text-xs text-gray-400">{expandedCustomer} &middot; {ordersList.filter((o) => o.customer.phone === expandedCustomer).length} orders</p>
+                      </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead><tr className="bg-gray-50 text-left">
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Order ID</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Placed Date</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Status</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Amount</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Payment</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Invoice</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Pesticides</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Crop</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap text-right">Qty</th>
+                          <th className="px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">Delivery</th>
+                        </tr></thead>
+                        <tbody className="divide-y divide-gray-50">
+                          {ordersList.filter((o) => o.customer.phone === expandedCustomer).sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()).map((o) => {
+                            const user = users.find((u) => u.phone === o.customer.phone);
+                            const locShort = user?.addresses[0] ? `${user.addresses[0].district}, ${user.addresses[0].state}` : "—";
+                            const locFull = user?.addresses.map((a) => `${a.address}, ${a.district}, ${a.state} - ${a.pin}`).join(" | ") || "—";
+                            const pesticides = o.items.map((i) => i.name).join(", ");
+                            const sm = JSON.parse(localStorage.getItem("mercbex_admin_scan_map") || "[]") as { sid: string; uid: string; crop: string }[];
+                            const crops = [...new Set(sm.filter((m) => m.uid === user?.id).map((m) => m.crop))].join(", ") || "—";
+                            const qty = o.items.reduce((s, i) => s + i.quantity, 0);
+                            const inv = `MBX-${o.id.replace("ORD", "")}`;
+                            return (
+                              <tr key={o.id} className="hover:bg-gray-50 transition">
+                                <td className="px-4 py-3 font-mono text-xs text-gray-500 whitespace-nowrap">{o.id}</td>
+                                <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{dt(o.placedAt)}</td>
+                                <td className="px-4 py-3 whitespace-nowrap">{orderStatusTag(o.status)}</td>
+                                <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">{fmt(o.total)}</td>
+                                <td className="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{o.payment}</td>
+                                <td className="px-4 py-3 whitespace-nowrap"><button onClick={(e) => { e.stopPropagation(); setInvoiceOrder(o); }} className="font-mono text-[10px] text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">{inv}</button></td>
+                                <td className="px-4 py-3 max-w-[180px]"><span className="text-xs text-gray-700 truncate block" title={pesticides}>{pesticides}</span></td>
+                                <td className="px-4 py-3 max-w-[100px]"><span className="text-xs text-gray-600 truncate block" title={crops}>{crops}</span></td>
+                                <td className="px-4 py-3 text-right text-sm font-semibold">{qty}</td>
+                                <td className="px-4 py-3 max-w-[140px]"><span className="text-xs text-gray-500 truncate block" title={locFull}>{locShort}</span></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
