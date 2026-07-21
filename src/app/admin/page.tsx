@@ -31,6 +31,31 @@ function orderStatusTag(status: string) {
   return <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${colors[status] || "bg-gray-100 text-gray-700"}`}>{label}</span>;
 }
 
+const FORMULATIONS = ["SC (Suspension Concentrate)", "EC (Emulsifiable Concentrate)", "WG (Water Dispersible Granule)", "WP (Wettable Powder)", "WDG (Water Dispersible Granule)", "SL (Soluble Liquid)", "GR (Granule)", "DF (Dry Flowable)", "ZC (Capsule Suspension)", "OS (Oil Suspension)", "Tablet"];
+const BADGE_OPTIONS = ["", "Best Seller", "Top Rated", "Recommended", "New", "Popular", "Fast Acting", "For Resistant Pests", "Value Pick", "Premium"];
+
+function TagInput({ tags, onChange, placeholder }: { tags: string[]; onChange: (t: string[]) => void; placeholder?: string }) {
+  const [input, setInput] = useState("");
+  const add = () => { const v = input.trim(); if (v && !tags.includes(v)) onChange([...tags, v]); setInput(""); };
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1.5">
+        {tags.map((t, i) => (
+          <span key={i} className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-0.5 rounded-md border border-emerald-200">
+            {t}
+            <button onClick={() => onChange(tags.filter((_, j) => j !== i))} className="text-emerald-400 hover:text-emerald-700 leading-none">&times;</button>
+          </span>
+        ))}
+      </div>
+      <div className="flex gap-1.5">
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
+          placeholder={placeholder} className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent" />
+        <button onClick={add} type="button" className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1.5 rounded-lg hover:bg-gray-200 font-medium">Add</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── NAV ──────────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS: { id: Tab; label: string; icon: string }[] = [
@@ -153,6 +178,17 @@ export default function AdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [invoiceOrder, setInvoiceOrder] = useState<(Order & { status: string }) | null>(null);
 
+  // Product modal
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<{
+    id: string; name: string; activeIngredient: string; formulation: string; category: string;
+    price: number; originalPrice: number | ""; rating: number; reviewCount: number;
+    description: string; targetPests: string[]; cropSuitability: string[]; dosage: string;
+    packSizes: string[]; features: string[]; inStock: boolean; badge: string;
+  }>({ id: "", name: "", activeIngredient: "", formulation: "SC (Suspension Concentrate)", category: "Insecticide",
+      price: 0, originalPrice: "", rating: 4.5, reviewCount: 0, description: "", targetPests: [],
+      cropSuitability: [], dosage: "", packSizes: [], features: [], inStock: true, badge: "" });
+
   // Data
   const [products, setProducts] = useState<Product[]>(() => {
     // Clear old seed flag so fresh seed data always loads
@@ -222,6 +258,24 @@ export default function AdminPage() {
     if (orderStatusFilter === "all") return ordersList;
     return ordersList.filter((o) => o.status === orderStatusFilter);
   }, [ordersList, orderStatusFilter]);
+
+  const saveProductForm = () => {
+    const d = editingProduct; if (!d.name.trim() || !d.price) return;
+    const product: Product = {
+      id: d.id, name: d.name.trim(), activeIngredient: d.activeIngredient.trim(), formulation: d.formulation,
+      category: d.category as Product["category"], price: d.price,
+      originalPrice: d.originalPrice !== "" ? d.originalPrice : undefined,
+      rating: d.rating, reviewCount: d.reviewCount, description: d.description.trim(),
+      targetPests: d.targetPests, cropSuitability: d.cropSuitability, dosage: d.dosage.trim(),
+      packSizes: d.packSizes, features: d.features, inStock: d.inStock, badge: d.badge || undefined,
+    };
+    const existing = products.findIndex((p) => p.id === product.id);
+    const updated = existing >= 0 ? products.map((p) => (p.id === product.id ? product : p)) : [...products, product];
+    setProducts(updated);
+    localStorage.setItem("mercbex_products_override", JSON.stringify(updated));
+    setShowProductModal(false);
+    showToast();
+  };
 
   const savePromo = () => { localStorage.setItem("mercbex_store_settings", JSON.stringify({ promoBanner: promo })); showToast(); };
 
@@ -427,7 +481,7 @@ export default function AdminPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-                <button className="px-4 py-2 bg-brand-800 text-white rounded-lg text-sm font-medium hover:bg-brand-900 transition">+ Add Product</button>
+                <button onClick={() => { setEditingProduct({ id: `admin-${Date.now().toString(36)}${Math.random().toString(36).substring(2, 5)}`, name: "", activeIngredient: "", formulation: "SC (Suspension Concentrate)", category: "Insecticide", price: 0, originalPrice: "", rating: 4.5, reviewCount: 0, description: "", targetPests: [], cropSuitability: [], dosage: "", packSizes: [], features: [], inStock: true, badge: "" }); setShowProductModal(true); }} className="px-4 py-2 bg-brand-800 text-white rounded-lg text-sm font-medium hover:bg-brand-900 transition">+ Add Product</button>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <select value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white">
@@ -471,7 +525,7 @@ export default function AdminPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-sm text-brand-700 hover:text-brand-800 font-medium cursor-pointer">Edit</span>
+                            <button onClick={() => { setEditingProduct({ id: p.id, name: p.name, activeIngredient: p.activeIngredient, formulation: p.formulation, category: p.category, price: p.price, originalPrice: p.originalPrice || "", rating: p.rating, reviewCount: p.reviewCount, description: p.description, targetPests: [...p.targetPests], cropSuitability: [...p.cropSuitability], dosage: p.dosage, packSizes: [...p.packSizes], features: [...p.features], inStock: p.inStock, badge: p.badge || "" }); setShowProductModal(true); }} className="text-sm text-brand-700 hover:text-brand-800 font-medium cursor-pointer">Edit</button>
                           </td>
                         </tr>
                       ))}
@@ -1015,6 +1069,89 @@ export default function AdminPage() {
           </div>
         );
       })()}
+
+      {/* ════ PRODUCT MODAL ════ */}
+      {showProductModal && (
+        <div className="fixed inset-0 z-[60] flex items-start justify-center pt-10 pb-10 px-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowProductModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+              <h2 className="font-bold text-gray-900 text-lg">{products.find((p) => p.id === editingProduct.id) ? "Edit Product" : "Add Product"}</h2>
+              <button onClick={() => setShowProductModal(false)} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
+                <input value={editingProduct.name} onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Category</label>
+                  <select value={editingProduct.category} onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    {categories.map((c) => <option key={c.slug} value={c.name}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Formulation</label>
+                  <select value={editingProduct.formulation} onChange={(e) => setEditingProduct({ ...editingProduct, formulation: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    {FORMULATIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Active Ingredient</label>
+                  <input value={editingProduct.activeIngredient} onChange={(e) => setEditingProduct({ ...editingProduct, activeIngredient: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Dosage</label>
+                  <input value={editingProduct.dosage} onChange={(e) => setEditingProduct({ ...editingProduct, dosage: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Price (₹) *</label>
+                  <input type="number" value={editingProduct.price || ""} onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Original</label>
+                  <input type="number" value={editingProduct.originalPrice || ""} onChange={(e) => setEditingProduct({ ...editingProduct, originalPrice: e.target.value ? Number(e.target.value) : "" })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Rating</label>
+                  <input type="number" step="0.1" min="0" max="5" value={editingProduct.rating} onChange={(e) => setEditingProduct({ ...editingProduct, rating: Number(e.target.value) })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Reviews</label>
+                  <input type="number" min="0" value={editingProduct.reviewCount} onChange={(e) => setEditingProduct({ ...editingProduct, reviewCount: Number(e.target.value) })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                  <select value={editingProduct.badge} onChange={(e) => setEditingProduct({ ...editingProduct, badge: e.target.value })} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white">
+                    {BADGE_OPTIONS.map((b) => <option key={b} value={b}>{b || "None"}</option>)}
+                  </select>
+                </div>
+                <div><label className="flex items-center gap-3 cursor-pointer pt-5">
+                  <input type="checkbox" checked={editingProduct.inStock} onChange={(e) => setEditingProduct({ ...editingProduct, inStock: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                  <span className="text-sm font-medium text-gray-700">In Stock</span>
+                </label></div>
+              </div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                <textarea value={editingProduct.description} onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })} rows={3} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Target Pests</label>
+                <TagInput tags={editingProduct.targetPests} onChange={(t) => setEditingProduct({ ...editingProduct, targetPests: t })} /></div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Crop Suitability</label>
+                <TagInput tags={editingProduct.cropSuitability} onChange={(t) => setEditingProduct({ ...editingProduct, cropSuitability: t })} /></div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Pack Sizes</label>
+                <TagInput tags={editingProduct.packSizes} onChange={(t) => setEditingProduct({ ...editingProduct, packSizes: t })} /></div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Features</label>
+                <TagInput tags={editingProduct.features} onChange={(t) => setEditingProduct({ ...editingProduct, features: t })} /></div>
+            </div>
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between rounded-b-2xl">
+              <button onClick={() => setShowProductModal(false)} className="text-sm text-gray-500 hover:text-gray-700 font-medium">Cancel</button>
+              <button onClick={saveProductForm} disabled={!editingProduct.name.trim() || !editingProduct.price}
+                className="bg-emerald-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                {products.find((p) => p.id === editingProduct.id) ? "Save Changes" : "Add Product"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
